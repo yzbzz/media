@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center_horizontal"
@@ -15,10 +16,13 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="10dp"
             android:background="#33ffff00"
-            android:text="路径："
+            android:text="原始路径："
             android:textColor="#ff0000" />
+
+        <Space
+            android:layout_width="10dp"
+            android:layout_height="wrap_content" />
 
         <TextView
             android:id="@+id/tv_media_path"
@@ -41,7 +45,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="#33ffff00"
-            android:text="时长："
+            android:text="原始时长："
             android:textColor="#ff0000" />
 
         <Space
@@ -61,17 +65,68 @@
 
     <Space
         android:layout_width="wrap_content"
-        android:layout_height="20dp" />
+        android:layout_height="10dp" />
 
-    <Button
-        android:id="@+id/btn_extractor"
+    <LinearLayout
+        android:id="@+id/ll_combine"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginHorizontal="20dp"
-        android:background="@color/colorPrimary"
-        android:gravity="center"
-        android:text="分离音频"
-        android:textColor="#ffffff" />
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#33ffff00"
+            android:text="合成路径："
+            android:textColor="#ff0000" />
+
+        <Space
+            android:layout_width="10dp"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/tv_combine_path"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="#33ffff00"
+            android:text="" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#33ffff00"
+            android:text="合成时长："
+            android:textColor="#ff0000" />
+
+        <Space
+            android:layout_width="10dp"
+            android:layout_height="wrap_content" />
+
+
+        <TextView
+            android:id="@+id/tv_combine_second"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#33ffff00"
+            android:text="秒"
+            android:textColor="#ff0000" />
+
+    </LinearLayout>
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="20dp" />
 
     <Button
         android:layout_marginTop="10dp"
@@ -81,7 +136,18 @@
         android:layout_marginHorizontal="20dp"
         android:background="@color/colorPrimary"
         android:gravity="center"
-        android:text="合并音频"
+        android:text="配音"
+        android:textColor="#ffffff" />
+
+    <Button
+        android:layout_marginTop="10dp"
+        android:id="@+id/btn_play"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginHorizontal="20dp"
+        android:background="@color/colorPrimary"
+        android:gravity="center"
+        android:text="播放"
         android:textColor="#ffffff" />
 
 </LinearLayout>

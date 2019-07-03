@@ -1,4 +1,4 @@
-package com.yzbzz.media.ui;
+package com.yzbzz.media.utils;
 
 import java.io.BufferedWriter;
 import java.io.File;

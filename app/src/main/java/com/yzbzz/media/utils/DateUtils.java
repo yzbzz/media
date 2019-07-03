@@ -1,4 +1,4 @@
-package com.yzbzz.media.ui;
+package com.yzbzz.media.utils;
 
 import com.yzbzz.media.bean.AudioBean;
 
@@ -100,6 +100,22 @@ public class DateUtils {
         } catch (Exception e) {
             e.printStackTrace();
             return "";
+        }
+    }
+
+    public static long getTime(String time) {
+        SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss.SSS");
+        try {
+            Date date1 = format.parse(time);
+            Calendar c = Calendar.getInstance();
+            c.setTime(date1);
+
+            long second = c.get(Calendar.SECOND);
+            long milliSecond = c.get(Calendar.MILLISECOND);
+            return second + milliSecond;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
         }
     }
 

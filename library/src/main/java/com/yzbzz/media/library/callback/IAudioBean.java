@@ -8,4 +8,6 @@ public interface IAudioBean<T> {
     T getBeginTime();
 
     T getEndTime();
+
+    IAudioBean create(T beingTime, T endTime);
 }

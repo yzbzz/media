@@ -11,5 +11,4 @@ public class SDCardUtils {
 
     public static String MEDIA_PATH = SD_PATH + "/x_demo";
 
-    public static String OUT_PUT_PATH = MEDIA_PATH + "/ffmpeg";
 }

@@ -18,6 +18,9 @@ import com.yzbzz.media.bean.AudioBean;
 import com.yzbzz.media.library.callback.Callback;
 import com.yzbzz.media.library.utils.FFmpegCmdUtils;
 import com.yzbzz.media.library.utils.FFmpegUtils;
+import com.yzbzz.media.utils.DateUtils;
+import com.yzbzz.media.utils.FileUtils;
+import com.yzbzz.media.utils.MediaUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -35,7 +38,13 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
     private TextView tvCombineSecond;
 
     private static String VIDEO_PATH = SDCardUtils.MEDIA_PATH + "/4594.mp4";
-    private static String FFMPEG_PATH = SDCardUtils.OUT_PUT_PATH + "/";
+    private static String FFMPEG_PATH = SDCardUtils.MEDIA_PATH + "/ffmpeg/";
+
+    private static String RECORD_FOLDER = "record/";
+    private static String BLANK_FOLDER = "blank/";
+
+    private static String RECORD_PATH = FFMPEG_PATH + RECORD_FOLDER;
+    private static String BLANK_PATH = FFMPEG_PATH + BLANK_FOLDER;
 
 
     private ProgressDialog progressDialog;
@@ -59,7 +68,7 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_ffmpeg);
+        setContentView(R.layout.activity_media);
 
         btnMerge = findViewById(R.id.btn_merge);
         btnPlay = findViewById(R.id.btn_play);
@@ -211,14 +220,16 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
 
             final boolean canRead = item.canRead;
 
-            final String canReadPath = count + ".mp3";
-            final String blankPath = "blank/" + count + ".mp3";
+            String recodeName = RECORD_FOLDER + count + ".mp3";
+            String blankName = BLANK_FOLDER + count + ".mp3";
 
-            String[] cmd = FFmpegCmdUtils.cutAudio(FFMPEG_PATH + "out_put.mp3", item.beginTime, item.endTime, canRead ? FFMPEG_PATH + canReadPath : FFMPEG_PATH + blankPath);
+            final String audioName = canRead ? recodeName : blankName;
+
+            String[] cmd = FFmpegCmdUtils.cutAudio(FFMPEG_PATH + "out_put.mp3", item.beginTime, item.endTime, FFMPEG_PATH + audioName);
             FFmpegUtils.executeCmd(this, cmd, new Callback<String>() {
                 @Override
                 public void onSuccess(String msg) {
-                    fileList.add(canRead ? canReadPath : blankPath);
+                    fileList.add(audioName);
                     clipAudios(items, count + 1);
                     Log.v("lhz", "audioBean: " + item);
                 }
