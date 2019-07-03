@@ -24,7 +24,7 @@ public class DateUtils {
                 temp1 = items.get(i);
                 temp2 = items.get(i + 1);
                 long tempTime = getIntervalTime(temp1.endTime, temp2.beginTime);
-                if (tempTime > 101) {
+                if (tempTime > 200) {
                     items.add(AudioBean.create(temp1.endTime, temp2.beginTime,
                             false));
                 } else {
@@ -35,7 +35,7 @@ public class DateUtils {
             AudioBean firstAudioBean = items.get(0);
             String firstTime = "00:00:00.000";
             long interval = getIntervalTime(firstTime, firstAudioBean.beginTime);
-            if (interval > 101) {
+            if (interval > 200) {
                 items.add(AudioBean.create(firstTime, firstAudioBean.beginTime,
                         false));
             } else {

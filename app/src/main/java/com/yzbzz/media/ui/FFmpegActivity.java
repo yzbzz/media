@@ -204,16 +204,17 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
             AudioBean item = items.get(count);
 
             final boolean canRead = item.canRead;
-            final String canReadPath = FFMPEG_PATH + count + ".mp3";
-            final String blankPath = FFMPEG_PATH + "/blank/" + count + ".mp3";
 
-            String[] cmd = FFmpegCmdUtils.cutAudio(FFMPEG_PATH + "out_put.mp3", item.beginTime, item.endTime, canRead ? canReadPath : blankPath);
+            final String canReadPath = count + ".mp3";
+            final String blankPath = "blank/" + count + ".mp3";
+
+            String[] cmd = FFmpegCmdUtils.cutAudio(FFMPEG_PATH + "out_put.mp3", item.beginTime, item.endTime, canRead ? FFMPEG_PATH + canReadPath : FFMPEG_PATH + blankPath);
             FFmpegUtils.executeCmd(this, cmd, new Callback<String>() {
                 @Override
                 public void onSuccess(String msg) {
                     fileList.add(canRead ? canReadPath : blankPath);
                     clipAudios(items, count + 1);
-                    Log.v("lhz","audioBean: " + item);
+                    Log.v("lhz", "audioBean: " + item);
                 }
 
                 @Override
@@ -225,7 +226,10 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void combine() {
-        String[] cmd = FFmpegCmdUtils.concatAudios(fileList, FFMPEG_PATH + "combine.mp3");
+
+        FileUtils.writeAudioInfo(FFMPEG_PATH + "audioList.txt", fileList);
+
+        String[] cmd = FFmpegCmdUtils.concatAudiosByFile(FFMPEG_PATH + "audioList.txt", FFMPEG_PATH + "combine.mp3");
         FFmpegUtils.executeCmd(this, cmd, new Callback<String>() {
             @Override
             public void onSuccess(String msg) {

@@ -93,10 +93,34 @@ public class FFmpegCmdUtils {
      */
     public static String[] cutAudio(String srcFile, String beginTime, String endTime, String outputFile) {
         // ffmpeg -i output_audio.mp3 -ss 00:00:02 -to 00:00:05 -y clip111.mp3
-        String extractAudioCmd = "-i %s -ss %s -to %s -y %s";
-        extractAudioCmd = String.format(extractAudioCmd, srcFile, beginTime, endTime, outputFile);
+        // ffmpeg -y -i filename -ss start -t duratio -codec copy
+        // ffmpeg -y -vn -ss start -t duration -i filenam -acodec copy
+//        String extractAudioCmd = "-i %s -ss %s -to %s -y %s";
+
+        // ffmpeg -ss 00:01:00 -i video.mp4 -to 00:02:00 -c copy -copyts cut.mp4
+        String extractAudioCmd = "-ss %s -i %s -to %s -c copy -copyts %s";
+        extractAudioCmd = String.format(extractAudioCmd, beginTime, srcFile, endTime, outputFile);
+
+//        String extractAudioCmd = "-i %s -ss %s -to %s -c copy %s";
+//        extractAudioCmd = String.format(extractAudioCmd,srcFile, beginTime, endTime, outputFile);
+
         String[] audioCmd = extractAudioCmd.split(" ");
         return audioCmd;
+    }
+
+    /**
+     * 拼接音频文件
+     *
+     * @param file   音频文件列表
+     * @param targetFile 输出文件
+     * @return ffmpeg命令
+     */
+    public static String[] concatAudiosByFile(String file, String targetFile) {
+        // ffmpeg -f concat -safe 0 -i mylist.txt -c copy -y combineall.mp3
+        String cmd = "-f concat -safe 0 -i %s -c copy -y %s";
+        cmd = String.format(cmd, file, targetFile);
+        Log.v("lhz", "cmd: " + cmd);
+        return cmd.split(" ");//以空格分割为字符串数组
     }
 
     /**
@@ -125,7 +149,7 @@ public class FFmpegCmdUtils {
         stringBuilder.append(" copy ");
         stringBuilder.append(targetFile);
         String concatAudioCmd = stringBuilder.toString();
-        Log.v("lhz","concatAudioCmd: " + concatAudioCmd);
+        Log.v("lhz", "concatAudioCmd: " + concatAudioCmd);
         return concatAudioCmd.split(" ");//以空格分割为字符串数组
     }
 
