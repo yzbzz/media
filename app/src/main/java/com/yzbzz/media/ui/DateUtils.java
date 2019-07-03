@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 /**
  * Created by yzbzz on 2019-07-03.
@@ -73,19 +74,27 @@ public class DateUtils {
     }
 
 
-    public static String getTimeStr(String beginTime, long addTime) {
+    public static String getTimeStr(long time) {
+        SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss.SSS");
+        try {
+            return format.format(time - TimeZone.getDefault().getRawOffset());
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+
+    public static String addTime(String beginTime,long addTime) {
         SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss.SSS");
         try {
             Date d1 = format.parse(beginTime);
-
             Calendar cal = Calendar.getInstance();
             cal.setTime(d1);
             cal.add(Calendar.MILLISECOND, (int) addTime);
-
             return format.format(cal.getTime());
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
+            return "";
         }
     }
 

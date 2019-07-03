@@ -1,5 +1,7 @@
 package com.yzbzz.media.library.utils;
 
+import android.util.Log;
+
 import java.util.List;
 
 /**
@@ -123,6 +125,7 @@ public class FFmpegCmdUtils {
         stringBuilder.append(" copy ");
         stringBuilder.append(targetFile);
         String concatAudioCmd = stringBuilder.toString();
+        Log.v("lhz","concatAudioCmd: " + concatAudioCmd);
         return concatAudioCmd.split(" ");//以空格分割为字符串数组
     }
 

@@ -64,16 +64,6 @@
         android:layout_height="20dp" />
 
     <Button
-        android:id="@+id/btn_extractor"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginHorizontal="20dp"
-        android:background="@color/colorPrimary"
-        android:gravity="center"
-        android:text="分离音频"
-        android:textColor="#ffffff" />
-
-    <Button
         android:layout_marginTop="10dp"
         android:id="@+id/btn_merge"
         android:layout_width="match_parent"
@@ -81,7 +71,18 @@
         android:layout_marginHorizontal="20dp"
         android:background="@color/colorPrimary"
         android:gravity="center"
-        android:text="合并音频"
+        android:text="配音"
+        android:textColor="#ffffff" />
+
+    <Button
+        android:layout_marginTop="10dp"
+        android:id="@+id/btn_play"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginHorizontal="20dp"
+        android:background="@color/colorPrimary"
+        android:gravity="center"
+        android:text="播放"
         android:textColor="#ffffff" />
 
 </LinearLayout>

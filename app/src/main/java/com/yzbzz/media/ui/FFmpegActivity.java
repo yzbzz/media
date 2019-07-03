@@ -5,9 +5,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.yzbzz.media.R;
@@ -23,8 +25,11 @@ import java.util.List;
 
 public class FFmpegActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private Button btnExtractor;
     private Button btnMerge;
+    private Button btnPlay;
+
+    private TextView tvMediaPath;
+    private TextView tvMediaSecond;
 
     private static String VIDEO_PATH = SDCardUtils.MEDIA_PATH + "/4594.mp4";
     private static String FFMPEG_PATH = SDCardUtils.OUT_PUT_PATH + "/";
@@ -40,10 +45,13 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
     private List<String> fileList = new ArrayList<>();
 
     private static int FAIL_ACTION = 0;
-    private static int EXTRACT_ACTION = FAIL_ACTION++;
+    private static int EXTRACT_AUDIO_ACTION = FAIL_ACTION++;
+    private static int EXTRACT_VIDEO_ACTION = FAIL_ACTION++;
     private static int CLIP_ACTION = FAIL_ACTION++;
     private static int COMBINE_ACTION = FAIL_ACTION++;
     private static int DONE_ACTION = FAIL_ACTION++;
+
+    private static String lastTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,10 +59,13 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
         setContentView(R.layout.activity_ffmpeg);
 
         btnMerge = findViewById(R.id.btn_merge);
-        btnExtractor = findViewById(R.id.btn_extractor);
+        btnPlay = findViewById(R.id.btn_play);
+
+        tvMediaPath = findViewById(R.id.tv_media_path);
+        tvMediaSecond = findViewById(R.id.tv_media_second);
 
         btnMerge.setOnClickListener(this);
-        btnExtractor.setOnClickListener(this);
+        btnPlay.setOnClickListener(this);
 
         myHandler = new MyHandler();
 
@@ -70,8 +81,11 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
             progressDialog.show();
             clearData();
             beginTime = System.currentTimeMillis();
-            myHandler.sendEmptyMessage(EXTRACT_ACTION);
-        } else if (id == R.id.btn_extractor) {
+            myHandler.sendEmptyMessage(EXTRACT_AUDIO_ACTION);
+        } else if (id == R.id.btn_play) {
+            String videoUrl = FFMPEG_PATH + "combine.mp3";
+            String audioUrl = FFMPEG_PATH + "out_put.mp4";
+            startActivity(ExoPlayerActivity.getExoPlayerIntent(this, videoUrl, audioUrl));
         }
     }
 
@@ -106,7 +120,35 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
         FFmpegUtils.executeCmd(this, cmd, new Callback<String>() {
             @Override
             public void onSuccess(String msg) {
+                myHandler.sendEmptyMessage(EXTRACT_VIDEO_ACTION);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        updateTime();
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(Exception error) {
+                myHandler.sendEmptyMessage(FAIL_ACTION);
+            }
+        });
+    }
+
+    private void extractorVideo() {
+        String outFile = FFMPEG_PATH + "out_put.mp4";
+        String[] cmd = FFmpegCmdUtils.extractorVideo(VIDEO_PATH, outFile);
+        FFmpegUtils.executeCmd(this, cmd, new Callback<String>() {
+            @Override
+            public void onSuccess(String msg) {
                 myHandler.sendEmptyMessage(CLIP_ACTION);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        updateTime();
+                    }
+                });
             }
 
             @Override
@@ -129,6 +171,7 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
         AudioBean audioBean9 = AudioBean.create("00:00:27.197", "00:00:28.137");
         AudioBean audioBean10 = AudioBean.create("00:00:28.322", "00:00:29.803");
 
+
         List<AudioBean> items = new ArrayList<>();
         items.add(audioBean0);
         items.add(audioBean1);
@@ -141,6 +184,11 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
         items.add(audioBean8);
         items.add(audioBean9);
         items.add(audioBean10);
+
+        if (!TextUtils.isEmpty(lastTime)) {
+            AudioBean audioBean11 = AudioBean.create(audioBean10.endTime, lastTime);
+            items.add(audioBean11);
+        }
 
         DateUtils.calculateTime(items);
 
@@ -155,8 +203,6 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
         } else {
             AudioBean item = items.get(count);
 
-            Log.v("lhzz",item.toString() +" count: " + count);
-
             final boolean canRead = item.canRead;
             final String canReadPath = FFMPEG_PATH + count + ".mp3";
             final String blankPath = FFMPEG_PATH + "/blank/" + count + ".mp3";
@@ -167,6 +213,7 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
                 public void onSuccess(String msg) {
                     fileList.add(canRead ? canReadPath : blankPath);
                     clipAudios(items, count + 1);
+                    Log.v("lhz","audioBean: " + item);
                 }
 
                 @Override
@@ -200,8 +247,10 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
             if (what == FAIL_ACTION) {
                 showToast("合成失败");
                 dismiss();
-            } else if (what == EXTRACT_ACTION) { // 分离音频
+            } else if (what == EXTRACT_AUDIO_ACTION) { // 分离音频
                 extractorAudio();
+            } else if (what == EXTRACT_VIDEO_ACTION) { // 分离视频
+                extractorVideo();
             } else if (what == CLIP_ACTION) { // 切割音频
                 clipAudio();
             } else if (what == COMBINE_ACTION) { // 合成音频
@@ -212,5 +261,13 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
                 dismiss();
             }
         }
+    }
+
+    private void updateTime() {
+        String outFile = FFMPEG_PATH + "out_put.mp3";
+        long time = MediaUtils.getFilePlayTime(this, new File(outFile));
+        lastTime = DateUtils.getTimeStr(time);
+        tvMediaPath.setText(outFile);
+        tvMediaSecond.setText(String.valueOf(time));
     }
 }
