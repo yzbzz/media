@@ -15,7 +15,12 @@ import java.util.TimeZone;
  */
 public class DateUtils {
 
-    public static void calculateTime(List<AudioBean> items) {
+    /**
+     *
+     * @param items
+     * @param durationTime 间隔时长
+     */
+    public static void calculateTime(List<AudioBean> items, long durationTime) {
         if (null != items && items.size() > 2) {
             int size = items.size();
             AudioBean temp1;
@@ -24,7 +29,7 @@ public class DateUtils {
                 temp1 = items.get(i);
                 temp2 = items.get(i + 1);
                 long tempTime = getIntervalTime(temp1.endTime, temp2.beginTime);
-                if (tempTime > 200) {
+                if (tempTime > durationTime) {
                     items.add(AudioBean.create(temp1.endTime, temp2.beginTime,
                             false));
                 } else {
@@ -35,7 +40,7 @@ public class DateUtils {
             AudioBean firstAudioBean = items.get(0);
             String firstTime = "00:00:00.000";
             long interval = getIntervalTime(firstTime, firstAudioBean.beginTime);
-            if (interval > 200) {
+            if (interval > durationTime) {
                 items.add(AudioBean.create(firstTime, firstAudioBean.beginTime,
                         false));
             } else {

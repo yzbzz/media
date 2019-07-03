@@ -196,7 +196,7 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
             items.add(audioBean11);
         }
 
-        DateUtils.calculateTime(items);
+        DateUtils.calculateTime(items, 200);
 
         clipAudios(items, 0);
     }
