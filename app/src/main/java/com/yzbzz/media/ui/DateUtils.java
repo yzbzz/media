@@ -14,7 +14,7 @@ import java.util.List;
  */
 public class DateUtils {
 
-    public static void caculateTime(List<AudioBean> items) {
+    public static void calculateTime(List<AudioBean> items) {
         if (null != items && items.size() > 2) {
             int size = items.size();
             AudioBean temp1;
