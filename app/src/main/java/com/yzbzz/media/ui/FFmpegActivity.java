@@ -31,6 +31,9 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
     private TextView tvMediaPath;
     private TextView tvMediaSecond;
 
+    private TextView tvCombinePath;
+    private TextView tvCombineSecond;
+
     private static String VIDEO_PATH = SDCardUtils.MEDIA_PATH + "/4594.mp4";
     private static String FFMPEG_PATH = SDCardUtils.OUT_PUT_PATH + "/";
 
@@ -63,6 +66,9 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
 
         tvMediaPath = findViewById(R.id.tv_media_path);
         tvMediaSecond = findViewById(R.id.tv_media_second);
+
+        tvCombinePath = findViewById(R.id.tv_combine_path);
+        tvCombineSecond = findViewById(R.id.tv_combine_second);
 
         btnMerge.setOnClickListener(this);
         btnPlay.setOnClickListener(this);
@@ -263,6 +269,7 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
                 endTime = System.currentTimeMillis();
                 showToast("合成完成 耗时: " + (endTime - beginTime) + "秒");
                 dismiss();
+                updateCombineTime();
             }
         }
     }
@@ -273,5 +280,12 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
         lastTime = DateUtils.getTimeStr(time);
         tvMediaPath.setText(outFile);
         tvMediaSecond.setText(String.valueOf(time));
+    }
+
+    private void updateCombineTime() {
+        String outFile = FFMPEG_PATH + "combine.mp3";
+        long time = MediaUtils.getFilePlayTime(this, new File(outFile));
+        tvCombinePath.setText(outFile);
+        tvCombineSecond.setText(String.valueOf(time));
     }
 }
