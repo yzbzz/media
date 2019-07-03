@@ -30,6 +30,7 @@ public class AudioBean {
 
     @Override
     public String toString() {
-        return "AudioBean{"+ beginTime + " " +endTime + " "+ canRead +"}";
+        return "AudioBean{" + beginTime + " " + endTime + " " + canRead + "}";
     }
+
 }
