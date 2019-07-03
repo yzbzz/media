@@ -1,7 +1,5 @@
 package com.yzbzz.media.library.utils;
 
-import android.util.Log;
-
 import java.util.List;
 
 /**
@@ -11,7 +9,8 @@ public class FFmpegCmdUtils {
 
     /**
      * 提取 AAC 音频
-     * @param srcFile 源文件
+     *
+     * @param srcFile    源文件
      * @param targetFile 输出文件
      * @return ffmpeg命令
      */
@@ -24,7 +23,8 @@ public class FFmpegCmdUtils {
 
     /**
      * 提取 Mp3 音频
-     * @param srcFile 源文件
+     *
+     * @param srcFile    源文件
      * @param targetFile 输出文件
      * @return ffmpeg命令
      */
@@ -37,7 +37,8 @@ public class FFmpegCmdUtils {
 
     /**
      * 提取音频
-     * @param srcFile 源文件
+     *
+     * @param srcFile    源文件
      * @param targetFile 输出文件
      * @return ffmpeg命令
      */
@@ -50,7 +51,8 @@ public class FFmpegCmdUtils {
 
     /**
      * 提取视频
-     * @param srcFile 源文件
+     *
+     * @param srcFile    源文件
      * @param targetFile 输出文件
      * @return ffmpeg命令
      */
@@ -63,8 +65,9 @@ public class FFmpegCmdUtils {
 
     /**
      * 通过步长截取音频（从 xx 秒开始，截取多长时间的音频）
-     * @param srcFile 源文件
-     * @param beginTime 开始时长
+     *
+     * @param srcFile      源文件
+     * @param beginTime    开始时长
      * @param durationTime 截取多长时间
      * @param outputFile
      * @return ffmpeg命令
@@ -74,12 +77,12 @@ public class FFmpegCmdUtils {
         String extractAudioCmd = "-i %s -vn -acodec copy -ss %s -t %s %s";
         extractAudioCmd = String.format(extractAudioCmd, srcFile, beginTime, durationTime, outputFile);
         String[] audioCmd = extractAudioCmd.split(" ");
-        Log.v("lhz","audioCmd: " + extractAudioCmd);
         return audioCmd;
     }
 
     /**
      * 截取音频（从 xx 秒到 xx 秒）
+     *
      * @param srcFile
      * @param beginTime
      * @param endTime
@@ -91,13 +94,13 @@ public class FFmpegCmdUtils {
         String extractAudioCmd = "-i %s -ss %s -to %s -y %s";
         extractAudioCmd = String.format(extractAudioCmd, srcFile, beginTime, endTime, outputFile);
         String[] audioCmd = extractAudioCmd.split(" ");
-        Log.v("lhz","audioCmd: " + extractAudioCmd);
         return audioCmd;
     }
 
     /**
      * 拼接音频文件
-     * @param srcFiles 音频文件列表
+     *
+     * @param srcFiles   音频文件列表
      * @param targetFile 输出文件
      * @return ffmpeg命令
      */
@@ -120,13 +123,13 @@ public class FFmpegCmdUtils {
         stringBuilder.append(" copy ");
         stringBuilder.append(targetFile);
         String concatAudioCmd = stringBuilder.toString();
-        Log.v("lhz", "cmd: " + concatAudioCmd);
         return concatAudioCmd.split(" ");//以空格分割为字符串数组
     }
 
     /**
      * 拼接2个音频
-     * @param srcFile 第一个音频文件
+     *
+     * @param srcFile    第一个音频文件
      * @param appendFile 第二个音频文件
      * @param targetFile 输出文件
      * @return ffmpeg命令
@@ -135,5 +138,11 @@ public class FFmpegCmdUtils {
         String concatAudioCmd = "-i concat:%s|%s -acodec copy %s";
         concatAudioCmd = String.format(concatAudioCmd, srcFile, appendFile, targetFile);
         return concatAudioCmd.split(" ");//以空格分割为字符串数组
+    }
+
+    public static String[] convertedFile(String srcFile, String targetFile) {
+        String convertedFileCmd = "-y -i %s %s";
+        convertedFileCmd = String.format(convertedFileCmd, srcFile, targetFile);
+        return convertedFileCmd.split(" ");
     }
 }
