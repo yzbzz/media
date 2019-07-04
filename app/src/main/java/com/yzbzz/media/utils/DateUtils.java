@@ -2,6 +2,7 @@ package com.yzbzz.media.utils;
 
 import com.yzbzz.media.bean.AudioBean;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collections;
@@ -16,7 +17,6 @@ import java.util.TimeZone;
 public class DateUtils {
 
     /**
-     *
      * @param items
      * @param durationTime 间隔时长
      */
@@ -89,7 +89,7 @@ public class DateUtils {
     }
 
 
-    public static String addTime(String beginTime,long addTime) {
+    public static String addTime(String beginTime, long addTime) {
         SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss.SSS");
         try {
             Date d1 = format.parse(beginTime);
@@ -112,7 +112,10 @@ public class DateUtils {
 
             float second = c.get(Calendar.SECOND);
             float milliSecond = c.get(Calendar.MILLISECOND);
-            return second + (milliSecond / 1000f);
+            float sum = second + (milliSecond / 1000f);
+            DecimalFormat decimalFormat = new DecimalFormat(".000");//构造方法的字符格式这里如果小数不足2位,会以0补足.
+            String p = decimalFormat.format(sum);
+            return Float.valueOf(p);
         } catch (Exception e) {
             e.printStackTrace();
             return 0;

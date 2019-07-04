@@ -104,10 +104,7 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
         } else if (id == R.id.btn_play) {
             String videoUrl = FFMPEG_PATH + "combine_audio.mp3";
             String audioUrl = FFMPEG_PATH + "out_put.mp4";
-            String mediaUrl = FFMPEG_PATH + "combine.mp4";
             startActivity(ExoPlayerActivity.getExoPlayerIntent(this, videoUrl, audioUrl));
-//            startActivity(ExoPlayerActivity.getExoPlayerIntent(this, mediaUrl));
-//            startActivity(VideoPlayActivity.getMediaActivityIntent(this,mediaUrl));
         }
     }
 

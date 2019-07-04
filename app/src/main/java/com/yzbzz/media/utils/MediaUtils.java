@@ -8,7 +8,6 @@ import android.media.MediaMetadataRetriever;
 import android.media.MediaMuxer;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.util.Log;
 
 import com.yzbzz.media.bean.Audio;
 import com.yzbzz.media.bean.AudioEntity;
@@ -53,10 +52,6 @@ public class MediaUtils {
                     path = MediaActivity.BLANK_PATH;
                 }
                 audioEntity.path = AudioEditUtil.cutAudio(path, audio, audioEntity.beginTime, audioEntity.endTime);
-                if (audioEntity.endTime == 21.512f) {
-                    audioEntity.path = MediaActivity.RECORD_PATH + "u_00007.wav";
-                }
-                Log.v("lhz", "audioEntity: " + audioEntity.toString());
             }
         }
         return audioEntities;

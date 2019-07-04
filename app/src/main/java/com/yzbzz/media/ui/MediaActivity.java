@@ -26,7 +26,9 @@ import java.util.List;
 
 public class MediaActivity extends AppCompatActivity implements View.OnClickListener {
 
+
     private Button btnMerge;
+    private Button btnDubbing;
     private Button btnPlay;
 
     private TextView tvMediaPath;
@@ -38,6 +40,8 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
     private static String VIDEO_PATH = SDCardUtils.MEDIA_PATH + "/4594.mp4";
     private static String MEDIA_PATH = SDCardUtils.MEDIA_PATH + "/media/";
 
+    private static String DUBBING_FOLDER = "dubbing/";
+    private static String DUBBING_WAV_FOLDER = "dubbing_wav/";
     private static String RECORD_FOLDER = "record/";
     private static String BLANK_FOLDER = "blank/";
 
@@ -55,12 +59,15 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
 
     List<AudioEntity> audioEntities = new ArrayList<>();
 
+    private boolean isDubbing;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_media);
 
-        btnMerge = findViewById(R.id.btn_dubbing);
+        btnMerge = findViewById(R.id.btn_merge);
+        btnDubbing = findViewById(R.id.btn_dubbing);
         btnPlay = findViewById(R.id.btn_play);
 
         tvMediaPath = findViewById(R.id.tv_media_path);
@@ -70,6 +77,7 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
         tvCombineSecond = findViewById(R.id.tv_combine_second);
 
         btnMerge.setOnClickListener(this);
+        btnDubbing.setOnClickListener(this);
         btnPlay.setOnClickListener(this);
 
         progressDialog = new ProgressDialog(this);
@@ -79,19 +87,12 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
     @Override
     public void onClick(View v) {
         int id = v.getId();
-        if (id == R.id.btn_dubbing) {
-            beginTime = System.currentTimeMillis();
-            progressDialog.show();
-            clearData();
-
-            AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
-                @Override
-                public void run() {
-                    extractMedia();
-                    clipAudio();
-                    mixAudio();
-                }
-            });
+        if (id == R.id.btn_merge) {
+            isDubbing = false;
+            begin();
+        } else if (id == R.id.btn_dubbing) {
+            isDubbing = true;
+            begin();
         } else if (id == R.id.btn_play) {
             String videoUrl = MEDIA_PATH + "combine_audio.wav";
             String audioUrl = MEDIA_PATH + "out_put.mp4";
@@ -99,9 +100,24 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
+    private void begin() {
+        beginTime = System.currentTimeMillis();
+        progressDialog.show();
+        clearData();
+
+        AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
+            @Override
+            public void run() {
+                extractMedia();
+                clipAudio();
+                mixAudio();
+            }
+        });
+    }
+
     private void clearData() {
         audioEntities.clear();
-        FileUtils.deleteFile(new File(MEDIA_PATH));
+        FileUtils.deleteFile(new File(MEDIA_PATH), "dubbing");
     }
 
     private void extractMedia() {
@@ -149,7 +165,7 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void clipAudios(final List<AudioBean> items) {
-        MediaUtils.decodeAudio(SDCardUtils.MEDIA_PATH +"/u_00007.mp3",RECORD_PATH + "/u_00007.wav");
+
         AudioEntity audioEntity;
         for (AudioBean audioBean : items) {
             float beginTime = DateUtils.getTime(audioBean.beginTime);
@@ -160,6 +176,28 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
 
         MediaUtils.cutAudios(RECORD_PATH, MEDIA_PATH + "out_put.mp3", audioEntities);
 
+        if (isDubbing) {
+            String name;
+            for (AudioEntity entity : audioEntities) {
+                if (entity.endTime == 7.970f) {
+                    name = MEDIA_PATH + DUBBING_WAV_FOLDER + "u_00002.wav";
+                    MediaUtils.decodeAudio(MEDIA_PATH + DUBBING_FOLDER + "u_00002.mp3", name);
+                    entity.path = name;
+                } else if (entity.endTime == 9.303f) {
+                    name = MEDIA_PATH + DUBBING_WAV_FOLDER + "u_00003.wav";
+                    MediaUtils.decodeAudio(MEDIA_PATH + DUBBING_FOLDER + "u_00003.mp3", name);
+                    entity.path = name;
+                } else if (entity.endTime == 21.512f) {
+                    name = MEDIA_PATH + DUBBING_WAV_FOLDER + "u_00007.wav";
+                    MediaUtils.decodeAudio(MEDIA_PATH + DUBBING_FOLDER + "u_00007.mp3", name);
+                    entity.path = name;
+                } else if (entity.endTime == 27.012f) {
+                    name = MEDIA_PATH + DUBBING_WAV_FOLDER + "u_00009.wav";
+                    MediaUtils.decodeAudio(MEDIA_PATH + DUBBING_FOLDER + "u_00009.mp3", name);
+                    entity.path =name;
+                }
+            }
+        }
     }
 
     private void showToast(final String msg) {
@@ -183,7 +221,6 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void mixAudio() {
-
         Collections.sort(audioEntities);
         int size = audioEntities.size();
         if (size < 2) {
