@@ -135,7 +135,7 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
 
     private void clearData() {
         fileList.clear();
-        FileUtils.deleteFile(new File(FFMPEG_PATH), "dubbing");
+        FileUtils.deleteFile(new File(FFMPEG_PATH), "dubbing", "dubbing_all");
     }
 
     private void showToast(final String msg) {
@@ -219,47 +219,14 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
         items.add(audioBean10);
 
         if (!TextUtils.isEmpty(lastTime)) {
-            AudioBean audioBean11 = AudioBean.create(audioBean10.endTime, lastTime,false);
+            AudioBean audioBean11 = AudioBean.create(audioBean10.endTime, lastTime, false);
             items.add(audioBean11);
         }
 
         DateUtils.calculateTime(items, 200);
 
-        if (isDubbing) {
-            clipAudiosByDubbing(items, 0);
-        } else {
-            clipAudios(items, 0);
-        }
-    }
+        clipAudios(items, 0);
 
-    private void clipAudiosByDubbing(final List<AudioBean> items, final int count) {
-        if (count >= items.size()) {
-            myHandler.sendEmptyMessage(COMBINE_AUDIO_ACTION);
-            return;
-        } else {
-            AudioBean item = items.get(count);
-
-            final boolean canRead = item.canRead;
-
-            String recodeName = RECORD_FOLDER + count + ".mp3";
-            String blankName = BLANK_FOLDER + count + ".mp3";
-
-            final String audioName = canRead ? recodeName : blankName;
-
-            String[] cmd = FFmpegCmdUtils.cutAudio(FFMPEG_PATH + "out_put.mp3", item.beginTime, item.endTime, FFMPEG_PATH + audioName);
-            FFmpegUtils.executeCmd(this, cmd, new Callback<String>() {
-                @Override
-                public void onSuccess(String msg) {
-                    fileList.add(audioName);
-                    clipAudiosByDubbing(items, count + 1);
-                }
-
-                @Override
-                public void onFailure(Exception e) {
-                    myHandler.sendEmptyMessage(FAIL_ACTION);
-                }
-            });
-        }
     }
 
     private int recodeCount = 1;
@@ -275,7 +242,7 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
             final boolean canRead = item.canRead;
 
             DecimalFormat decimalFormat = new DecimalFormat("000");//确定格式，把1转换为001
-            String suffix = "u_00";
+            String suffix;
 
             if (canRead) {
                 suffix = "u_00" + decimalFormat.format(recodeCount) + ".mp3";
