@@ -24,6 +24,17 @@ public class AudioEditUtil {
      * @param cutEndTime   裁剪结束时间
      */
     public static String cutAudio(String path, Audio audio, float cutStartTime, float cutEndTime) {
+        return cutAudio(path, audio, cutEndTime + "", cutStartTime, cutEndTime);
+    }
+
+    /**
+     * 裁剪音频
+     *
+     * @param audio        音频信息
+     * @param cutStartTime 裁剪开始时间
+     * @param cutEndTime   裁剪结束时间
+     */
+    public static String cutAudio(String path, Audio audio, String fileName, float cutStartTime, float cutEndTime) {
         if (cutStartTime == 0 && cutEndTime == audio.getTimeMillis() / 1000f) {
             return "";
         }
@@ -38,8 +49,8 @@ public class AudioEditUtil {
         RandomAccessFile srcFis = null;
         RandomAccessFile newFos = null;
 
-        String tempOutPath = srcWavePath + cutEndTime + ".temp";
-        String tempOutPathWAV = path + "/" + cutEndTime + ".wav";
+        String tempOutPath = srcWavePath + fileName + ".temp";
+        String tempOutPathWAV = path + "/" + fileName + ".wav";
         try {
 
             //创建输入流
@@ -263,8 +274,8 @@ public class AudioEditUtil {
         String aacFilePath = lj + name + ".aac";
 
 
-       AudioEncodeUtil.convertWav2Pcm(audio.getPath(), pcmFilePath);
-       AudioEncodeUtil.convertPcm2Acc(pcmFilePath, aacFilePath);
+        AudioEncodeUtil.convertWav2Pcm(audio.getPath(), pcmFilePath);
+        AudioEncodeUtil.convertPcm2Acc(pcmFilePath, aacFilePath);
 
     }
 

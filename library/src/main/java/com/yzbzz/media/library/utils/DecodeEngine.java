@@ -280,7 +280,7 @@ public class DecodeEngine {
 
         if (isWave) {
             convertPcmFileToWaveFile(pcmFilePath, wavFilePath, sampleRate, channelCount, bitNumber);
-//            new File(pcmFilePath).delete();
+            new File(pcmFilePath).delete();
         }
 
         return true;

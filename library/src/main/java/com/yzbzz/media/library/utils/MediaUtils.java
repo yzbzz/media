@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.text.DecimalFormat;
 import java.util.List;
 
 /**
@@ -24,7 +25,7 @@ import java.util.List;
  */
 public class MediaUtils {
 
-    public static List<AudioEntity> cutAudios(String sdcardPath, String srcPath, List<AudioEntity> audioEntities ,String recordPath,String blankPath) {
+    public static List<AudioEntity> cutAudios(String sdcardPath, String srcPath, List<AudioEntity> audioEntities, String recordPath, String blankPath) {
 
         String outName = "dest" + Constant.SUFFIX_WAV;
 
@@ -42,15 +43,25 @@ public class MediaUtils {
 
         if (audio != null) {
             int size = audioEntities.size();
+            int recodeCount = 1;
+            int blankCount = 1;
+
+            DecimalFormat decimalFormat = new DecimalFormat("000");//确定格式，把1转换为001
+            String suffix;
+
             for (int i = 0; i < size; i++) {
                 AudioEntity audioEntity = audioEntities.get(i);
                 String path;
                 if (audioEntity.canRead) {
+                    suffix = "u_00" + decimalFormat.format(recodeCount);
                     path = recordPath;
+                    recodeCount++;
                 } else {
                     path = blankPath;
+                    suffix = "b_00" + decimalFormat.format(blankCount);
+                    blankCount++;
                 }
-                audioEntity.path = AudioEditUtil.cutAudio(path, audio, audioEntity.beginTime, audioEntity.endTime);
+                audioEntity.path = AudioEditUtil.cutAudio(path, audio, suffix, audioEntity.beginTime, audioEntity.endTime);
             }
         }
         return audioEntities;

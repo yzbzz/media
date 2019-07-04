@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -26,9 +27,9 @@ import java.util.List;
 
 public class MediaActivity extends AppCompatActivity implements View.OnClickListener {
 
-
     private Button btnMerge;
-    private Button btnDubbing;
+    private Button btnDubbingPart;
+    private Button btnDubbingAll;
     private Button btnPlay;
 
     private TextView tvMediaPath;
@@ -41,7 +42,10 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
     private static String MEDIA_PATH = SDCardUtils.MEDIA_PATH + "/media/";
 
     private static String DUBBING_FOLDER = "dubbing/";
+    private static String DUBBING_ALL_FOLDER = "dubbing_all/";
+
     private static String DUBBING_WAV_FOLDER = "dubbing_wav/";
+
     private static String RECORD_FOLDER = "record/";
     private static String BLANK_FOLDER = "blank/";
 
@@ -54,12 +58,15 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
     private long beginTime;
     private long endTime;
 
-    private static int FAIL_ACTION = 0;
     private static String lastTime;
 
     List<AudioEntity> audioEntities = new ArrayList<>();
 
-    private boolean isDubbing;
+    private static int COMBINE_ORIGINAL = 1;
+    private static int COMBINE_PART = 2;
+    private static int COMBINE_ALL = 3;
+
+    private static int COMBINE = COMBINE_ORIGINAL;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +74,8 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
         setContentView(R.layout.activity_media);
 
         btnMerge = findViewById(R.id.btn_merge);
-        btnDubbing = findViewById(R.id.btn_dubbing);
+        btnDubbingPart = findViewById(R.id.btn_dubbing);
+        btnDubbingAll = findViewById(R.id.btn_dubbing_all);
         btnPlay = findViewById(R.id.btn_play);
 
         tvMediaPath = findViewById(R.id.tv_media_path);
@@ -77,7 +85,8 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
         tvCombineSecond = findViewById(R.id.tv_combine_second);
 
         btnMerge.setOnClickListener(this);
-        btnDubbing.setOnClickListener(this);
+        btnDubbingPart.setOnClickListener(this);
+        btnDubbingAll.setOnClickListener(this);
         btnPlay.setOnClickListener(this);
 
         progressDialog = new ProgressDialog(this);
@@ -88,10 +97,13 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
     public void onClick(View v) {
         int id = v.getId();
         if (id == R.id.btn_merge) {
-            isDubbing = false;
+            COMBINE = COMBINE_ORIGINAL;
             begin();
         } else if (id == R.id.btn_dubbing) {
-            isDubbing = true;
+            COMBINE = COMBINE_PART;
+            begin();
+        } else if (id == R.id.btn_dubbing_all) {
+            COMBINE = COMBINE_ALL;
             begin();
         } else if (id == R.id.btn_play) {
             String videoUrl = MEDIA_PATH + "combine_audio.wav";
@@ -117,7 +129,7 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
 
     private void clearData() {
         audioEntities.clear();
-        FileUtils.deleteFile(new File(MEDIA_PATH), "dubbing");
+        FileUtils.deleteFile(new File(MEDIA_PATH), "dubbing", "dubbing_all");
     }
 
     private void extractMedia() {
@@ -155,7 +167,7 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
         items.add(audioBean10);
 
         if (!TextUtils.isEmpty(lastTime)) {
-            AudioBean audioBean11 = AudioBean.create(audioBean10.endTime, lastTime);
+            AudioBean audioBean11 = AudioBean.create(audioBean10.endTime, lastTime, false);
             items.add(audioBean11);
         }
 
@@ -176,28 +188,7 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
 
         MediaUtils.cutAudios(RECORD_PATH, MEDIA_PATH + "out_put.mp3", audioEntities, RECORD_PATH, BLANK_PATH);
 
-        if (isDubbing) {
-            String name;
-            for (AudioEntity entity : audioEntities) {
-                if (entity.endTime == 7.970f) {
-                    name = MEDIA_PATH + DUBBING_WAV_FOLDER + "u_00002.wav";
-                    MediaUtils.decodeAudio(MEDIA_PATH + DUBBING_FOLDER + "u_00002.mp3", name);
-                    entity.path = name;
-                } else if (entity.endTime == 9.303f) {
-                    name = MEDIA_PATH + DUBBING_WAV_FOLDER + "u_00003.wav";
-                    MediaUtils.decodeAudio(MEDIA_PATH + DUBBING_FOLDER + "u_00003.mp3", name);
-                    entity.path = name;
-                } else if (entity.endTime == 21.512f) {
-                    name = MEDIA_PATH + DUBBING_WAV_FOLDER + "u_00007.wav";
-                    MediaUtils.decodeAudio(MEDIA_PATH + DUBBING_FOLDER + "u_00007.mp3", name);
-                    entity.path = name;
-                } else if (entity.endTime == 27.012f) {
-                    name = MEDIA_PATH + DUBBING_WAV_FOLDER + "u_00009.wav";
-                    MediaUtils.decodeAudio(MEDIA_PATH + DUBBING_FOLDER + "u_00009.mp3", name);
-                    entity.path = name;
-                }
-            }
-        }
+
     }
 
     private void showToast(final String msg) {
@@ -232,9 +223,48 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
             files.add(new File(audioBean.path));
         }
 
+        if (COMBINE == COMBINE_PART) {
+            String path = MEDIA_PATH + DUBBING_FOLDER;
+            File dubbingFile = new File(path);
+            File[] dubbinFile = dubbingFile.listFiles();
+            int length = dubbinFile.length;
+
+            for (int j = 0; j < length; j++) {
+                File duFile = dubbinFile[j];
+                String du = duFile.getName();
+
+                String duM = du.substring(0, du.indexOf("."));
+                String newFileName = duFile.getParentFile().getAbsolutePath() + "/" + duM + ".wav";
+
+                if (du.endsWith(".mp3")) {
+                    MediaUtils.decodeAudio(duFile.getAbsolutePath(), newFileName);
+                }
+            }
+
+            resetFileList(path, files);
+
+        } else if (COMBINE == COMBINE_ALL) {
+            String path = MEDIA_PATH + DUBBING_ALL_FOLDER;
+            File dubbingFile = new File(path);
+            File[] dubbinFile = dubbingFile.listFiles();
+            int length = dubbinFile.length;
+
+            for (int j = 0; j < length; j++) {
+                File duFile = dubbinFile[j];
+                String du = duFile.getName();
+                String duM = du.substring(0, du.indexOf("."));
+                String newFileName = duFile.getParentFile().getAbsolutePath() + "/" + duM + ".wav";
+
+                if (du.endsWith(".mp3")) {
+                    MediaUtils.decodeAudio(duFile.getAbsolutePath(), newFileName);
+                }
+            }
+            resetFileList(path, files);
+        }
+
         try {
-            WavMergeUtil.mergeWav(files, new File(MEDIA_PATH + "combine_audio.wav"));
             Thread.sleep(300);
+            WavMergeUtil.mergeWav(files, new File(MEDIA_PATH + "combine_audio.wav"));
             updateCombineTime();
             dismiss();
             endTime = System.currentTimeMillis();
@@ -242,6 +272,48 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void resetFileList(String path, List<File> items) {
+        File dubbingFile = new File(path);
+        File[] files = dubbingFile.listFiles();
+        int length = files.length;
+
+        int size = items.size();
+        for (int i = 0; i < size; i++) {
+            File fileName = items.get(i);
+            String fn = fileName.getName();
+
+            for (int j = 0; j < length; j++) {
+                File duFile = files[j];
+                String du = duFile.getName();
+
+                if (fn.equalsIgnoreCase(du)) {
+                    Log.v("lhz","fn: " + fn+" du: " + du);
+                    items.set(i, duFile);
+                }
+            }
+
+        }
+//        for (int i = 0; i < size; i++) {
+//            File fileName = items.get(i);
+//            String fn = fileName.getName();
+//            String fnM = fn.substring(0, fn.indexOf("."));
+//
+//            for (int j = 0; j < length; j++) {
+//                File duFile = files[j];
+//                String du = duFile.getName();
+//                if (du.endsWith(".mp3")) {
+//                    String duM = du.substring(0, du.indexOf("."));
+//                    if (fnM.equalsIgnoreCase(duM)) {
+//                        String newFileName = duFile.getParentFile().getAbsolutePath() + "/" + duM + ".wav";
+//
+//                        MediaUtils.decodeAudio(duFile.getAbsolutePath(), newFileName);
+//                        items.set(i, new File(newFileName));
+//                    }
+//                }
+//            }
+//        }
     }
 
 

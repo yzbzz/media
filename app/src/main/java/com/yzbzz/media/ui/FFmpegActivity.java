@@ -6,7 +6,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -296,10 +295,6 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
             resetFileList(FFMPEG_PATH + DUBBING_FOLDER);
         } else if (COMBINE == COMBINE_ALL) {
             resetFileList(FFMPEG_PATH + DUBBING_ALL_FOLDER);
-        }
-
-        for(String item: fileList) {
-            Log.v("lhz", item);
         }
 
         FileUtils.writeAudioInfo(FFMPEG_PATH + "audioList.txt", fileList);
