@@ -15,38 +15,54 @@ import java.util.List;
  */
 public class FileUtils {
 
-    public static void copyDir(String oldPath, String newPath) throws IOException {
-        File file = new File(oldPath);
-        //文件名称列表
-        String[] filePath = file.list();
+    public static void copyAllFiles(File files, File fileCopy) {
+        try {
+            //判断是否是文件
+            if (files.isDirectory()) {
+                // 如果不存在，创建文件夹
+                if (!fileCopy.exists()) {
+                    fileCopy.mkdir();
+                }
+                // 将文件夹下的文件存入文件数组
+                String[] fs = files.list();
+                for (String f : fs) {
+                    //创建文件夹下的子目录
+                    File srcFile = new File(files, f);
+                    File destFile = new File(fileCopy, f);
+                    // 将文件进行下一层循环
+                    copyAllFiles(srcFile, destFile);
+                }
+            } else {
 
-        if (!(new File(newPath)).exists()) {
-            (new File(newPath)).mkdir();
-        }
 
-        for (int i = 0; i < filePath.length; i++) {
-            if ((new File(oldPath + file.separator + filePath[i])).isDirectory()) {
-                copyDir(oldPath  + file.separator  + filePath[i], newPath  + file.separator + filePath[i]);
+                // 创建文件输入的字节流用于读取文件内容，源文件
+                FileInputStream fis = new FileInputStream(files);
+
+                // 创建文件输出的字节流，用于将读取到的问件内容写到另一个磁盘文件中，目标文件
+                FileOutputStream os = new FileOutputStream(fileCopy);
+
+                // 创建字符串，用于缓冲
+
+                int len = -1;
+                byte[] b = new byte[1024];
+                while (true) {
+                    // 从文件输入流中读取数据。每执行一次,数据读到字节数组b中
+                    len = fis.read(b, 0, 256);
+                    if (len == -1) {
+                        break;
+                    }
+                    System.out.println(b.toString());
+                    os.write(b);
+                }
+                os.write("\r\n".getBytes()); // 换行
+                fis.close();
+                os.close();
             }
 
-            if (new File(oldPath  + file.separator + filePath[i]).isFile()) {
-                copyFile(oldPath + file.separator + filePath[i], newPath + file.separator + filePath[i]);
-            }
-
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-    }
 
-    public static void copyFile(String oldPath, String newPath) throws IOException {
-        File oldFile = new File(oldPath);
-        File file = new File(newPath);
-        FileInputStream in = new FileInputStream(oldFile);
-        FileOutputStream out = new FileOutputStream(file);;
-
-        byte[] buffer=new byte[2097152];
-
-        while((in.read(buffer)) != -1){
-            out.write(buffer);
-        }
     }
 
     public static void deleteFile(File file, String filterName) {
