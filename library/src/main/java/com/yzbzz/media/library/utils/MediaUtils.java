@@ -1,4 +1,4 @@
-package com.yzbzz.media.utils;
+package com.yzbzz.media.library.utils;
 
 import android.content.Context;
 import android.media.MediaCodec;
@@ -9,10 +9,9 @@ import android.media.MediaMuxer;
 import android.media.MediaPlayer;
 import android.net.Uri;
 
-import com.yzbzz.media.bean.Audio;
-import com.yzbzz.media.bean.AudioEntity;
-import com.yzbzz.media.common.Constant;
-import com.yzbzz.media.ui.MediaActivity;
+import com.yzbzz.media.library.bean.Audio;
+import com.yzbzz.media.library.bean.AudioEntity;
+import com.yzbzz.media.library.common.Constant;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -25,7 +24,7 @@ import java.util.List;
  */
 public class MediaUtils {
 
-    public static List<AudioEntity> cutAudios(String sdcardPath, String srcPath, List<AudioEntity> audioEntities) {
+    public static List<AudioEntity> cutAudios(String sdcardPath, String srcPath, List<AudioEntity> audioEntities ,String recordPath,String blankPath) {
 
         String outName = "dest" + Constant.SUFFIX_WAV;
 
@@ -47,9 +46,9 @@ public class MediaUtils {
                 AudioEntity audioEntity = audioEntities.get(i);
                 String path;
                 if (audioEntity.canRead) {
-                    path = MediaActivity.RECORD_PATH;
+                    path = recordPath;
                 } else {
-                    path = MediaActivity.BLANK_PATH;
+                    path = blankPath;
                 }
                 audioEntity.path = AudioEditUtil.cutAudio(path, audio, audioEntity.beginTime, audioEntity.endTime);
             }
@@ -456,37 +455,4 @@ public class MediaUtils {
         mediaMetadataRetriever.release();
         return durationStr;
     }
-
-//    public static long getWavLength(String filePath) {
-//
-//        MediaExtractor extractor = new MediaExtractor();
-//        MediaFormat mediaFormat = null;
-//
-//        try {
-//            extractor.setDataSource(filePath);
-//        } catch (Exception ex) {
-//            ex.printStackTrace();
-//            try {
-//                extractor.setDataSource(new FileInputStream(filePath).getFD());
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//
-//        int numTracks = extractor.getTrackCount();
-//        for (int i = 0; i < numTracks; i++) {
-//            MediaFormat format = extractor.getTrackFormat(i);
-//            String mimeType = format.getString(MediaFormat.KEY_MIME);
-//            if (mimeType.startsWith("audio/")) {
-//                mediaFormat = format;
-//                break;
-//            }
-//        }
-//        long duration = mediaFormat.containsKey(MediaFormat.KEY_DURATION) ? mediaFormat.getLong
-//                (MediaFormat.KEY_DURATION)
-//                : 0;
-//
-//        return duration;
-//
-//    }
 }

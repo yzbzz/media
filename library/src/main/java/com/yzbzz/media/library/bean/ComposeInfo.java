@@ -1,4 +1,4 @@
-package com.yzbzz.media.bean;
+package com.yzbzz.media.library.bean;
 
 /**
  * 音频合成信息

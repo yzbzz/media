@@ -12,12 +12,12 @@ import android.widget.Toast;
 
 import com.yzbzz.media.R;
 import com.yzbzz.media.SDCardUtils;
-import com.yzbzz.media.bean.AudioBean;
-import com.yzbzz.media.bean.AudioEntity;
-import com.yzbzz.media.utils.DateUtils;
-import com.yzbzz.media.utils.FileUtils;
-import com.yzbzz.media.utils.MediaUtils;
-import com.yzbzz.media.utils.WavMergeUtil;
+import com.yzbzz.media.library.bean.AudioBean;
+import com.yzbzz.media.library.bean.AudioEntity;
+import com.yzbzz.media.library.utils.DateUtils;
+import com.yzbzz.media.library.utils.FileUtils;
+import com.yzbzz.media.library.utils.MediaUtils;
+import com.yzbzz.media.library.utils.WavMergeUtil;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -174,7 +174,7 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
             audioEntities.add(audioEntity);
         }
 
-        MediaUtils.cutAudios(RECORD_PATH, MEDIA_PATH + "out_put.mp3", audioEntities);
+        MediaUtils.cutAudios(RECORD_PATH, MEDIA_PATH + "out_put.mp3", audioEntities, RECORD_PATH, BLANK_PATH);
 
         if (isDubbing) {
             String name;
@@ -194,7 +194,7 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
                 } else if (entity.endTime == 27.012f) {
                     name = MEDIA_PATH + DUBBING_WAV_FOLDER + "u_00009.wav";
                     MediaUtils.decodeAudio(MEDIA_PATH + DUBBING_FOLDER + "u_00009.mp3", name);
-                    entity.path =name;
+                    entity.path = name;
                 }
             }
         }

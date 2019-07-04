@@ -1,6 +1,6 @@
-package com.yzbzz.media.utils.encode;
+package com.yzbzz.media.library.utils.encode;
 
-import com.yzbzz.media.common.Constant;
+import com.yzbzz.media.library.common.Constant;
 
 import java.io.File;
 import java.io.FileInputStream;

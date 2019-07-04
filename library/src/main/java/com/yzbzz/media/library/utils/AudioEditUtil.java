@@ -1,7 +1,7 @@
-package com.yzbzz.media.utils;
+package com.yzbzz.media.library.utils;
 
 
-import com.yzbzz.media.bean.Audio;
+import com.yzbzz.media.library.bean.Audio;
 
 import java.io.File;
 import java.io.IOException;

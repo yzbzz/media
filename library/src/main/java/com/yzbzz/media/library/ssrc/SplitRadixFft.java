@@ -5,7 +5,7 @@
  * for any purpose (include commercial use) and without fee.
  * Please refer to this package when you modify this code.
  */
-package com.yzbzz.media.ssrc;
+package com.yzbzz.media.library.ssrc;
 
 /**
  * Fast Fourier/Cosine/Sine Transform.

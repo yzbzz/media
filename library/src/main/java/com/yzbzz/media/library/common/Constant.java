@@ -1,4 +1,4 @@
-package com.yzbzz.media.common;
+package com.yzbzz.media.library.common;
 
 
 public class Constant {

@@ -14,13 +14,13 @@ import android.widget.Toast;
 
 import com.yzbzz.media.R;
 import com.yzbzz.media.SDCardUtils;
-import com.yzbzz.media.bean.AudioBean;
+import com.yzbzz.media.library.bean.AudioBean;
 import com.yzbzz.media.library.callback.Callback;
 import com.yzbzz.media.library.utils.FFmpegCmdUtils;
 import com.yzbzz.media.library.utils.FFmpegUtils;
-import com.yzbzz.media.utils.DateUtils;
-import com.yzbzz.media.utils.FileUtils;
-import com.yzbzz.media.utils.MediaUtils;
+import com.yzbzz.media.library.utils.DateUtils;
+import com.yzbzz.media.library.utils.FileUtils;
+import com.yzbzz.media.library.utils.MediaUtils;
 
 import java.io.File;
 import java.util.ArrayList;

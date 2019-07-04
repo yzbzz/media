@@ -1,4 +1,4 @@
-package com.yzbzz.media.utils;
+package com.yzbzz.media.library.utils;
 
 import android.os.Looper;
 

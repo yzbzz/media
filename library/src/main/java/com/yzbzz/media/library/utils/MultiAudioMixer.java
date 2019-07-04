@@ -1,8 +1,8 @@
-package com.yzbzz.media.utils;
+package com.yzbzz.media.library.utils;
 
 import android.util.Log;
 
-import com.yzbzz.media.bean.ComposeInfo;
+import com.yzbzz.media.library.bean.ComposeInfo;
 
 import java.io.FileInputStream;
 import java.io.IOException;

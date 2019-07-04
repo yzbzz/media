@@ -1,6 +1,6 @@
-package com.yzbzz.media.utils;
+package com.yzbzz.media.library.utils;
 
-import com.yzbzz.media.bean.AudioBean;
+import com.yzbzz.media.library.bean.AudioBean;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;

@@ -1,4 +1,4 @@
-package com.yzbzz.media.utils;
+package com.yzbzz.media.library.utils;
 
 /**
  * 各基础类型与byte之间的转换

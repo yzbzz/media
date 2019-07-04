@@ -5,7 +5,7 @@
  * indicated explicitly.
  */
 
-package com.yzbzz.media.ssrc;
+package com.yzbzz.media.library.ssrc;
 
 import java.io.File;
 import java.io.FileInputStream;

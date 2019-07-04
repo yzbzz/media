@@ -1,4 +1,4 @@
-package com.yzbzz.media.bean;
+package com.yzbzz.media.library.bean;
 
 import android.media.AudioFormat;
 import android.media.MediaExtractor;

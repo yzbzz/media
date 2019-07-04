@@ -1,4 +1,4 @@
-package com.yzbzz.media.utils.encode;
+package com.yzbzz.media.library.utils.encode;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;

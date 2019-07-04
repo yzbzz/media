@@ -1,4 +1,4 @@
-package com.yzbzz.media.utils;
+package com.yzbzz.media.library.utils;
 
 import android.annotation.TargetApi;
 import android.media.AudioFormat;
@@ -8,8 +8,8 @@ import android.media.MediaFormat;
 import android.os.Build;
 import android.text.TextUtils;
 
-import com.yzbzz.media.common.Constant;
-import com.yzbzz.media.ssrc.SSRC;
+import com.yzbzz.media.library.common.Constant;
+import com.yzbzz.media.library.ssrc.SSRC;
 
 import java.io.BufferedOutputStream;
 import java.io.File;

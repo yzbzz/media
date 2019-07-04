@@ -1,7 +1,7 @@
-package com.yzbzz.media.utils;
+package com.yzbzz.media.library.utils;
 
-import com.yzbzz.media.common.Constant;
-import com.yzbzz.media.utils.encode.AudioEncoder;
+import com.yzbzz.media.library.common.Constant;
+import com.yzbzz.media.library.utils.encode.AudioEncoder;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;

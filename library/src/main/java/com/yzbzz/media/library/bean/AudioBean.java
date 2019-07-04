@@ -1,4 +1,4 @@
-package com.yzbzz.media.bean;
+package com.yzbzz.media.library.bean;
 
 /**
  * Created by yzbzz on 2019-07-03.
