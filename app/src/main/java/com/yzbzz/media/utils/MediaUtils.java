@@ -4,19 +4,92 @@ import android.content.Context;
 import android.media.MediaCodec;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaMuxer;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.util.Log;
+
+import com.yzbzz.media.bean.Audio;
+import com.yzbzz.media.bean.AudioEntity;
+import com.yzbzz.media.common.Constant;
+import com.yzbzz.media.ui.MediaActivity;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.List;
 
 /**
  * Created by yzbzz on 2019-07-03.
  */
 public class MediaUtils {
+
+    public static List<AudioEntity> cutAudios(String sdcardPath, String srcPath, List<AudioEntity> audioEntities) {
+
+        String outName = "dest" + Constant.SUFFIX_WAV;
+
+        //裁剪后音频的路径
+        String destPath = sdcardPath + outName;
+
+        //解码源音频，得到解码后的文件
+        decodeAudio(srcPath, destPath);
+
+        if (!FileUtils.checkFileExist(destPath)) {
+            return null;
+        }
+
+        Audio audio = getAudioFromPath(destPath);
+
+        if (audio != null) {
+            int size = audioEntities.size();
+            for (int i = 0; i < size; i++) {
+                AudioEntity audioEntity = audioEntities.get(i);
+                String path;
+                if (audioEntity.canRead) {
+                    path = MediaActivity.RECORD_PATH;
+                } else {
+                    path = MediaActivity.BLANK_PATH;
+                }
+                audioEntity.path = AudioEditUtil.cutAudio(path, audio, audioEntity.beginTime, audioEntity.endTime);
+                if (audioEntity.endTime == 21.512f) {
+                    audioEntity.path = MediaActivity.RECORD_PATH + "u_00007.wav";
+                }
+                Log.v("lhz", "audioEntity: " + audioEntity.toString());
+            }
+        }
+        return audioEntities;
+    }
+
+    public static void decodeAudio(String path, String destPath) {
+        final File file = new File(path);
+
+        if (FileUtils.checkFileExist(destPath)) {
+            FileUtils.deleteFile(new File(destPath));
+        }
+
+        FileUtils.confirmFolderExist(new File(destPath).getParent());
+
+        DecodeEngine.getInstance().convertMusicFileToWaveFile(path, destPath);
+    }
+
+    private static Audio getAudioFromPath(String path) {
+        if (!FileUtils.checkFileExist(path)) {
+            return null;
+        }
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
+            try {
+                Audio audio = Audio.createAudioFromFile(new File(path));
+                return audio;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return null;
+    }
 
     /**
      * 获取时间长度
@@ -34,7 +107,7 @@ public class MediaUtils {
         return 0;
     }
 
-    public static void exactorMedia(String input,String outputVideo,String outputAudio) {
+    public static void exactorMedia(String input, String outputVideo, String outputAudio) {
         MediaExtractor mediaExtractor = new MediaExtractor();
 
         FileOutputStream videoOutputStream = null;
@@ -93,7 +166,7 @@ public class MediaUtils {
             // 切换到音频信道
             mediaExtractor.selectTrack(audioTrackIndex);
             while (mediaExtractor.readSampleData(byteBuffer, 0) >= 0) {
-                int readSampleCount =  mediaExtractor.getSampleTrackIndex();
+                int readSampleCount = mediaExtractor.getSampleTrackIndex();
 
                 byte[] buffer = new byte[readSampleCount];
                 byteBuffer.get(buffer);
@@ -380,4 +453,45 @@ public class MediaUtils {
             audioExtractor.release();
         }
     }
+
+    public static String getDuration(File file) {
+        MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
+        mediaMetadataRetriever.setDataSource(file.getAbsolutePath());
+        String durationStr = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+        mediaMetadataRetriever.release();
+        return durationStr;
+    }
+
+//    public static long getWavLength(String filePath) {
+//
+//        MediaExtractor extractor = new MediaExtractor();
+//        MediaFormat mediaFormat = null;
+//
+//        try {
+//            extractor.setDataSource(filePath);
+//        } catch (Exception ex) {
+//            ex.printStackTrace();
+//            try {
+//                extractor.setDataSource(new FileInputStream(filePath).getFD());
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//
+//        int numTracks = extractor.getTrackCount();
+//        for (int i = 0; i < numTracks; i++) {
+//            MediaFormat format = extractor.getTrackFormat(i);
+//            String mimeType = format.getString(MediaFormat.KEY_MIME);
+//            if (mimeType.startsWith("audio/")) {
+//                mediaFormat = format;
+//                break;
+//            }
+//        }
+//        long duration = mediaFormat.containsKey(MediaFormat.KEY_DURATION) ? mediaFormat.getLong
+//                (MediaFormat.KEY_DURATION)
+//                : 0;
+//
+//        return duration;
+//
+//    }
 }

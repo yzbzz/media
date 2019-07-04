@@ -103,16 +103,16 @@ public class DateUtils {
         }
     }
 
-    public static long getTime(String time) {
+    public static float getTime(String time) {
         SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss.SSS");
         try {
             Date date1 = format.parse(time);
             Calendar c = Calendar.getInstance();
             c.setTime(date1);
 
-            long second = c.get(Calendar.SECOND);
-            long milliSecond = c.get(Calendar.MILLISECOND);
-            return second + milliSecond;
+            float second = c.get(Calendar.SECOND);
+            float milliSecond = c.get(Calendar.MILLISECOND);
+            return second + (milliSecond / 1000f);
         } catch (Exception e) {
             e.printStackTrace();
             return 0;

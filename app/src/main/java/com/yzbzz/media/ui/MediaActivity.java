@@ -13,12 +13,15 @@ import android.widget.Toast;
 import com.yzbzz.media.R;
 import com.yzbzz.media.SDCardUtils;
 import com.yzbzz.media.bean.AudioBean;
+import com.yzbzz.media.bean.AudioEntity;
 import com.yzbzz.media.utils.DateUtils;
 import com.yzbzz.media.utils.FileUtils;
 import com.yzbzz.media.utils.MediaUtils;
+import com.yzbzz.media.utils.WavMergeUtil;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class MediaActivity extends AppCompatActivity implements View.OnClickListener {
@@ -38,8 +41,8 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
     private static String RECORD_FOLDER = "record/";
     private static String BLANK_FOLDER = "blank/";
 
-    private static String RECORD_PATH = MEDIA_PATH + RECORD_FOLDER;
-    private static String BLANK_PATH = MEDIA_PATH + BLANK_FOLDER;
+    public static String RECORD_PATH = MEDIA_PATH + RECORD_FOLDER;
+    public static String BLANK_PATH = MEDIA_PATH + BLANK_FOLDER;
 
 
     private ProgressDialog progressDialog;
@@ -47,16 +50,10 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
     private long beginTime;
     private long endTime;
 
-    private List<String> fileList = new ArrayList<>();
-
     private static int FAIL_ACTION = 0;
-    private static int EXTRACT_AUDIO_ACTION = FAIL_ACTION++;
-    private static int EXTRACT_VIDEO_ACTION = FAIL_ACTION++;
-    private static int CLIP_ACTION = FAIL_ACTION++;
-    private static int COMBINE_ACTION = FAIL_ACTION++;
-    private static int DONE_ACTION = FAIL_ACTION++;
-
     private static String lastTime;
+
+    List<AudioEntity> audioEntities = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,28 +83,32 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
             beginTime = System.currentTimeMillis();
             progressDialog.show();
             clearData();
-            beginTime = System.currentTimeMillis();
+
             AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
                 @Override
                 public void run() {
                     extractMedia();
+                    clipAudio();
+                    mixAudio();
                 }
             });
         } else if (id == R.id.btn_play) {
-            String videoUrl = MEDIA_PATH + "combine.mp3";
+            String videoUrl = MEDIA_PATH + "combine_audio.wav";
             String audioUrl = MEDIA_PATH + "out_put.mp4";
             startActivity(ExoPlayerActivity.getExoPlayerIntent(this, videoUrl, audioUrl));
         }
     }
 
     private void clearData() {
-        fileList.clear();
+        audioEntities.clear();
         FileUtils.deleteFile(new File(MEDIA_PATH));
     }
 
     private void extractMedia() {
         MediaUtils.extractAudio(VIDEO_PATH, MEDIA_PATH + "out_put.mp3");
         MediaUtils.extractVideo(VIDEO_PATH, MEDIA_PATH + "out_put.mp4");
+
+        updateTime();
     }
 
     private void clipAudio() {
@@ -144,12 +145,20 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
 
         DateUtils.calculateTime(items, 200);
 
-
-
-        clipAudios(items, 0);
+        clipAudios(items);
     }
 
-    private void clipAudios(final List<AudioBean> items, final int count) {
+    private void clipAudios(final List<AudioBean> items) {
+        MediaUtils.decodeAudio(SDCardUtils.MEDIA_PATH +"/u_00007.mp3",RECORD_PATH + "/u_00007.wav");
+        AudioEntity audioEntity;
+        for (AudioBean audioBean : items) {
+            float beginTime = DateUtils.getTime(audioBean.beginTime);
+            float endTime = DateUtils.getTime(audioBean.endTime);
+            audioEntity = new AudioEntity(beginTime, endTime, audioBean.canRead);
+            audioEntities.add(audioEntity);
+        }
+
+        MediaUtils.cutAudios(RECORD_PATH, MEDIA_PATH + "out_put.mp3", audioEntities);
 
     }
 
@@ -173,40 +182,61 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
         });
     }
 
+    private void mixAudio() {
 
+        Collections.sort(audioEntities);
+        int size = audioEntities.size();
+        if (size < 2) {
+            return;
+        }
+
+        List<File> files = new ArrayList<>();
+        for (AudioEntity audioBean : audioEntities) {
+            files.add(new File(audioBean.path));
+        }
+
+        try {
+            WavMergeUtil.mergeWav(files, new File(MEDIA_PATH + "combine_audio.wav"));
+            Thread.sleep(300);
+            updateCombineTime();
+            dismiss();
+            endTime = System.currentTimeMillis();
+            showToast("合并完成,耗时: " + (endTime - beginTime) + "秒");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 
     private void combine() {
 
-//        FileUtils.writeAudioInfo(FFMPEG_PATH + "audioList.txt", fileList);
-//
-//        String[] cmd = FFmpegCmdUtils.concatAudiosByFile(FFMPEG_PATH + "audioList.txt", FFMPEG_PATH + "combine.mp3");
-//        FFmpegUtils.executeCmd(this, cmd, new Callback<String>() {
-//            @Override
-//            public void onSuccess(String msg) {
-//                myHandler.sendEmptyMessage(DONE_ACTION);
-//            }
-//
-//            @Override
-//            public void onFailure(Exception e) {
-//                myHandler.sendEmptyMessage(FAIL_ACTION);
-//            }
-//        });
     }
 
 
     private void updateTime() {
-//        String outFile = FFMPEG_PATH + "out_put.mp3";
-//        long time = MediaUtils.getFilePlayTime(this, new File(outFile));
-//        lastTime = DateUtils.getTimeStr(time);
-//        tvMediaPath.setText(outFile);
-//        tvMediaSecond.setText(String.valueOf(time));
+        String outFile = MEDIA_PATH + "out_put.mp3";
+        long time = MediaUtils.getFilePlayTime(MediaActivity.this, new File(outFile));
+        lastTime = DateUtils.getTimeStr(time);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                tvMediaPath.setText(outFile);
+                tvMediaSecond.setText(String.valueOf(time));
+            }
+        });
     }
 
     private void updateCombineTime() {
-//        String outFile = FFMPEG_PATH + "combine.mp3";
-//        long time = MediaUtils.getFilePlayTime(this, new File(outFile));
-//        tvCombinePath.setText(outFile);
-//        tvCombineSecond.setText(String.valueOf(time));
+        String outFile = MEDIA_PATH + "combine_audio.wav";
+
+        long time = MediaUtils.getFilePlayTime(MediaActivity.this, new File(outFile));
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                tvCombinePath.setText(outFile);
+                tvCombineSecond.setText(String.valueOf(time));
+            }
+        });
     }
 }

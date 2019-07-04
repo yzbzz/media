@@ -1,5 +1,7 @@
 package com.yzbzz.media.utils;
 
+import android.text.TextUtils;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -56,4 +58,36 @@ public class FileUtils {
             }
         }
     }
+
+    /**
+     * 确保目录存在,没有则创建
+     */
+    public static boolean confirmFolderExist(String folderPath) {
+
+        File file = new File(folderPath);
+        if (!file.exists()) {
+            return file.mkdirs();
+        }
+
+        return false;
+    }
+
+    public static boolean checkFileExist(String filePath) {
+        if (TextUtils.isEmpty(filePath)) {
+            return false;
+        }
+        return new File(filePath).exists();
+    }
+
+    /**
+     * 重命名
+     */
+    public static File renameFile(File srcFile, String newName) {
+
+        File destFile = new File(newName);
+        srcFile.renameTo(destFile);
+
+        return destFile;
+    }
+
 }

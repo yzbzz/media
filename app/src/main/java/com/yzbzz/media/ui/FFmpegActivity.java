@@ -93,7 +93,6 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
             beginTime = System.currentTimeMillis();
             progressDialog.show();
             clearData();
-            beginTime = System.currentTimeMillis();
             myHandler.sendEmptyMessage(EXTRACT_AUDIO_ACTION);
         } else if (id == R.id.btn_play) {
             String videoUrl = FFMPEG_PATH + "combine_audio.mp3";

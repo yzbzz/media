@@ -1,7 +1,5 @@
 package com.yzbzz.media.utils;
 
-import android.util.Log;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -16,10 +14,9 @@ import java.util.List;
  */
 public class WavMergeUtil {
 
-    public static void mergeWav(List<File> inputs, File output) throws IOException {
-        long beginTime = System.currentTimeMillis();
+    public static File mergeWav(List<File> inputs, File output) throws IOException {
         if (inputs.size() < 1) {
-            return;
+            return output;
         }
         FileInputStream fis = new FileInputStream(inputs.get(0));
         FileOutputStream fos = new FileOutputStream(output);
@@ -54,8 +51,7 @@ public class WavMergeUtil {
         byte[] dataLen = intToByteArray(total);
         res.write(dataLen, 0, 4);
         res.close();
-        long endTime = System.currentTimeMillis();
-        Log.v("lhz", "合并结束: " + (endTime - beginTime));
+        return output;
     }
 
     /**
