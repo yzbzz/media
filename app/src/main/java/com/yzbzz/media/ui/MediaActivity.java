@@ -60,7 +60,7 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_media);
 
-        btnMerge = findViewById(R.id.btn_merge);
+        btnMerge = findViewById(R.id.btn_dubbing);
         btnPlay = findViewById(R.id.btn_play);
 
         tvMediaPath = findViewById(R.id.tv_media_path);
@@ -79,7 +79,7 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
     @Override
     public void onClick(View v) {
         int id = v.getId();
-        if (id == R.id.btn_merge) {
+        if (id == R.id.btn_dubbing) {
             beginTime = System.currentTimeMillis();
             progressDialog.show();
             clearData();
