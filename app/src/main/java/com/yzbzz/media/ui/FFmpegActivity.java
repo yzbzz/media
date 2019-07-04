@@ -43,9 +43,6 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
     private static String RECORD_FOLDER = "record/";
     private static String BLANK_FOLDER = "blank/";
 
-    private static String RECORD_PATH = FFMPEG_PATH + RECORD_FOLDER;
-    private static String BLANK_PATH = FFMPEG_PATH + BLANK_FOLDER;
-
 
     private ProgressDialog progressDialog;
 
@@ -60,7 +57,8 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
     private static int EXTRACT_AUDIO_ACTION = FAIL_ACTION++;
     private static int EXTRACT_VIDEO_ACTION = FAIL_ACTION++;
     private static int CLIP_ACTION = FAIL_ACTION++;
-    private static int COMBINE_ACTION = FAIL_ACTION++;
+    private static int COMBINE_AUDIO_ACTION = FAIL_ACTION++;
+    private static int COMBINE_MEDIA_ACTION = FAIL_ACTION++;
     private static int DONE_ACTION = FAIL_ACTION++;
 
     private static String lastTime;
@@ -98,29 +96,25 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
             beginTime = System.currentTimeMillis();
             myHandler.sendEmptyMessage(EXTRACT_AUDIO_ACTION);
         } else if (id == R.id.btn_play) {
-//            combine();
-
-            String videoUrl = FFMPEG_PATH + "combine.mp3";
+            String videoUrl = FFMPEG_PATH + "combine_audio.mp3";
             String audioUrl = FFMPEG_PATH + "out_put.mp4";
             startActivity(ExoPlayerActivity.getExoPlayerIntent(this, videoUrl, audioUrl));
         }
     }
 
     private void combineMedia() {
-
-        String videoUrl = FFMPEG_PATH + "combine.mp3";
+        String videoUrl = FFMPEG_PATH + "combine_audio.mp3";
         String audioUrl = FFMPEG_PATH + "out_put.mp4";
-//            startActivity(ExoPlayerActivity.getExoPlayerIntent(this, videoUrl, audioUrl));
-        String[] cmd = FFmpegCmdUtils.combineMedia(videoUrl,audioUrl,FFMPEG_PATH +"op.mp4");
+        String[] cmd = FFmpegCmdUtils.combineMedia(videoUrl, audioUrl, FFMPEG_PATH + "combine.mp4");
         FFmpegUtils.executeCmd(this, cmd, new Callback<String>() {
             @Override
             public void onSuccess(String s) {
-                Log.v("lhz","合并成功");
+                myHandler.sendEmptyMessage(DONE_ACTION);
             }
 
             @Override
             public void onFailure(Exception error) {
-                Log.v("lhz","合并失败：" + error);
+                myHandler.sendEmptyMessage(FAIL_ACTION);
             }
         });
     }
@@ -157,12 +151,7 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
             @Override
             public void onSuccess(String msg) {
                 myHandler.sendEmptyMessage(EXTRACT_VIDEO_ACTION);
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        updateTime();
-                    }
-                });
+
             }
 
             @Override
@@ -179,12 +168,6 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
             @Override
             public void onSuccess(String msg) {
                 myHandler.sendEmptyMessage(CLIP_ACTION);
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        updateTime();
-                    }
-                });
             }
 
             @Override
@@ -234,7 +217,7 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
 
     private void clipAudios(final List<AudioBean> items, final int count) {
         if (count >= items.size()) {
-            myHandler.sendEmptyMessage(COMBINE_ACTION);
+            myHandler.sendEmptyMessage(COMBINE_AUDIO_ACTION);
             return;
         } else {
             AudioBean item = items.get(count);
@@ -263,15 +246,13 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
-    private void combine() {
-
+    private void combineAudio() {
         FileUtils.writeAudioInfo(FFMPEG_PATH + "audioList.txt", fileList);
-
-        String[] cmd = FFmpegCmdUtils.concatAudiosByFile(FFMPEG_PATH + "audioList.txt", FFMPEG_PATH + "combine.mp3");
+        String[] cmd = FFmpegCmdUtils.concatAudiosByFile(FFMPEG_PATH + "audioList.txt", FFMPEG_PATH + "combine_audio.mp3");
         FFmpegUtils.executeCmd(this, cmd, new Callback<String>() {
             @Override
             public void onSuccess(String msg) {
-                myHandler.sendEmptyMessage(DONE_ACTION);
+                myHandler.sendEmptyMessage(COMBINE_MEDIA_ACTION);
             }
 
             @Override
@@ -292,17 +273,19 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
             } else if (what == EXTRACT_AUDIO_ACTION) { // 分离音频
                 extractorAudio();
             } else if (what == EXTRACT_VIDEO_ACTION) { // 分离视频
+                updateTime();
                 extractorVideo();
             } else if (what == CLIP_ACTION) { // 切割音频
                 clipAudio();
-            } else if (what == COMBINE_ACTION) { // 合成音频
-//                combine();
-            } else if (what == DONE_ACTION) { // 完成
+            } else if (what == COMBINE_AUDIO_ACTION) { // 合成音频
+                combineAudio();
+            } else if (what == COMBINE_MEDIA_ACTION) { // 合成音视频
+                updateCombineTime();
                 combineMedia();
+            } else if (what == DONE_ACTION) { // 完成
                 endTime = System.currentTimeMillis();
                 showToast("合成完成 耗时: " + (endTime - beginTime) + "秒");
                 dismiss();
-                updateCombineTime();
             }
         }
     }
@@ -316,7 +299,7 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void updateCombineTime() {
-        String outFile = FFMPEG_PATH + "combine.mp3";
+        String outFile = FFMPEG_PATH + "combine_audio.mp3";
         long time = MediaUtils.getFilePlayTime(this, new File(outFile));
         tvCombinePath.setText(outFile);
         tvCombineSecond.setText(String.valueOf(time));
