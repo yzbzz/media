@@ -16,13 +16,14 @@ import com.yzbzz.media.R;
 import com.yzbzz.media.SDCardUtils;
 import com.yzbzz.media.library.bean.AudioBean;
 import com.yzbzz.media.library.callback.Callback;
+import com.yzbzz.media.library.utils.DateUtils;
 import com.yzbzz.media.library.utils.FFmpegCmdUtils;
 import com.yzbzz.media.library.utils.FFmpegUtils;
-import com.yzbzz.media.library.utils.DateUtils;
 import com.yzbzz.media.library.utils.FileUtils;
 import com.yzbzz.media.library.utils.MediaUtils;
 
 import java.io.File;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -134,7 +135,7 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
 
     private void clearData() {
         fileList.clear();
-        FileUtils.deleteFile(new File(FFMPEG_PATH),"dubbing");
+        FileUtils.deleteFile(new File(FFMPEG_PATH), "dubbing");
     }
 
     private void showToast(final String msg) {
@@ -218,7 +219,7 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
         items.add(audioBean10);
 
         if (!TextUtils.isEmpty(lastTime)) {
-            AudioBean audioBean11 = AudioBean.create(audioBean10.endTime, lastTime);
+            AudioBean audioBean11 = AudioBean.create(audioBean10.endTime, lastTime,false);
             items.add(audioBean11);
         }
 
@@ -281,6 +282,8 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
+    private int recodeCount = 1;
+    private int blankCount = 1;
 
     private void clipAudios(final List<AudioBean> items, final int count) {
         if (count >= items.size()) {
@@ -291,8 +294,17 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
 
             final boolean canRead = item.canRead;
 
-            String recodeName = RECORD_FOLDER + count + ".mp3";
-            String blankName = BLANK_FOLDER + count + ".mp3";
+            DecimalFormat decimalFormat = new DecimalFormat("000");//确定格式，把1转换为001
+            String suffix = "u_00";
+
+            if (canRead) {
+                suffix = "u_00" + decimalFormat.format(recodeCount) + ".mp3";
+            } else {
+                suffix = "b_00" + decimalFormat.format(blankCount) + ".mp3";
+            }
+
+            String recodeName = RECORD_FOLDER + suffix;
+            String blankName = BLANK_FOLDER + suffix;
 
             final String audioName = canRead ? recodeName : blankName;
 
@@ -300,6 +312,11 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
             FFmpegUtils.executeCmd(this, cmd, new Callback<String>() {
                 @Override
                 public void onSuccess(String msg) {
+                    if (canRead) {
+                        recodeCount++;
+                    } else {
+                        blankCount++;
+                    }
                     fileList.add(audioName);
                     clipAudios(items, count + 1);
                     Log.v("lhz", "audioBean: " + item);
