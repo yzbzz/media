@@ -24,6 +24,7 @@
         <activity android:name=".ui.MediaActivity"/>
         <activity android:name=".ui.FFmpegActivity"/>
         <activity android:name=".ui.ExoPlayerActivity"/>
+        <activity android:name=".ui.VideoPlayActivity"/>
     </application>
 
 </manifest>

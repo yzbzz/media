@@ -23,7 +23,6 @@ import com.yzbzz.media.utils.FileUtils;
 import com.yzbzz.media.utils.MediaUtils;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -105,7 +104,10 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
         } else if (id == R.id.btn_play) {
             String videoUrl = FFMPEG_PATH + "combine_audio.mp3";
             String audioUrl = FFMPEG_PATH + "out_put.mp4";
+            String mediaUrl = FFMPEG_PATH + "combine.mp4";
             startActivity(ExoPlayerActivity.getExoPlayerIntent(this, videoUrl, audioUrl));
+//            startActivity(ExoPlayerActivity.getExoPlayerIntent(this, mediaUrl));
+//            startActivity(VideoPlayActivity.getMediaActivityIntent(this,mediaUrl));
         }
     }
 
@@ -113,13 +115,6 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
         beginTime = System.currentTimeMillis();
         progressDialog.show();
         clearData();
-        if (isDubbing) {
-            try {
-                FileUtils.copyDir(SDCardUtils.MEDIA_PATH +"/"+ DUBBING_FOLDER, FFMPEG_PATH + DUBBING_FOLDER);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
         myHandler.sendEmptyMessage(EXTRACT_AUDIO_ACTION);
     }
 
@@ -142,7 +137,7 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
 
     private void clearData() {
         fileList.clear();
-        FileUtils.deleteFile(new File(FFMPEG_PATH));
+        FileUtils.deleteFile(new File(FFMPEG_PATH),"dubbing");
     }
 
     private void showToast(final String msg) {
