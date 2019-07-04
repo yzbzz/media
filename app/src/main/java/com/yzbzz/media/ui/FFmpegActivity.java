@@ -98,10 +98,31 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
             beginTime = System.currentTimeMillis();
             myHandler.sendEmptyMessage(EXTRACT_AUDIO_ACTION);
         } else if (id == R.id.btn_play) {
+//            combine();
+
             String videoUrl = FFMPEG_PATH + "combine.mp3";
             String audioUrl = FFMPEG_PATH + "out_put.mp4";
             startActivity(ExoPlayerActivity.getExoPlayerIntent(this, videoUrl, audioUrl));
         }
+    }
+
+    private void combineMedia() {
+
+        String videoUrl = FFMPEG_PATH + "combine.mp3";
+        String audioUrl = FFMPEG_PATH + "out_put.mp4";
+//            startActivity(ExoPlayerActivity.getExoPlayerIntent(this, videoUrl, audioUrl));
+        String[] cmd = FFmpegCmdUtils.combineMedia(videoUrl,audioUrl,FFMPEG_PATH +"op.mp4");
+        FFmpegUtils.executeCmd(this, cmd, new Callback<String>() {
+            @Override
+            public void onSuccess(String s) {
+                Log.v("lhz","合并成功");
+            }
+
+            @Override
+            public void onFailure(Exception error) {
+                Log.v("lhz","合并失败：" + error);
+            }
+        });
     }
 
     private void clearData() {
@@ -275,8 +296,9 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
             } else if (what == CLIP_ACTION) { // 切割音频
                 clipAudio();
             } else if (what == COMBINE_ACTION) { // 合成音频
-                combine();
+//                combine();
             } else if (what == DONE_ACTION) { // 完成
+                combineMedia();
                 endTime = System.currentTimeMillis();
                 showToast("合成完成 耗时: " + (endTime - beginTime) + "秒");
                 dismiss();

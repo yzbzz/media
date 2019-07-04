@@ -111,7 +111,7 @@ public class FFmpegCmdUtils {
     /**
      * 拼接音频文件
      *
-     * @param file   音频文件列表
+     * @param file       音频文件列表
      * @param targetFile 输出文件
      * @return ffmpeg命令
      */
@@ -167,9 +167,23 @@ public class FFmpegCmdUtils {
         return concatAudioCmd.split(" ");//以空格分割为字符串数组
     }
 
+    /**
+     * 文件转换
+     *
+     * @param srcFile
+     * @param targetFile
+     * @return
+     */
     public static String[] convertedFile(String srcFile, String targetFile) {
         String convertedFileCmd = "-y -i %s %s";
         convertedFileCmd = String.format(convertedFileCmd, srcFile, targetFile);
+        return convertedFileCmd.split(" ");
+    }
+
+    public static String[] combineMedia(String videoFile, String audioFile, String outputFile) {
+        // -i 1.mp4 -i 1.mp3 -vcodec copy -acodec copy 1.mp4
+        String convertedFileCmd = "-i %s -i %s -vcodec copy -acodec copy %s";
+        convertedFileCmd = String.format(convertedFileCmd, videoFile, audioFile, outputFile);
         return convertedFileCmd.split(" ");
     }
 }
