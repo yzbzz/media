@@ -147,7 +147,7 @@
         android:layout_marginHorizontal="20dp"
         android:background="@color/colorPrimary"
         android:gravity="center"
-        android:text="配音合成(部分)"
+        android:text="配音合成"
         android:textColor="#ffffff" />
 
     <Button

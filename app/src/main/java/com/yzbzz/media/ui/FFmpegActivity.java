@@ -30,7 +30,8 @@ import java.util.List;
 public class FFmpegActivity extends AppCompatActivity implements View.OnClickListener {
 
     private Button btnMerge;
-    private Button btnDubbing;
+    private Button btnDubbingPart;
+    private Button btnDubbingAll;
     private Button btnPlay;
 
     private TextView tvMediaPath;
@@ -43,6 +44,8 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
     private static String FFMPEG_PATH = SDCardUtils.MEDIA_PATH + "/ffmpeg/";
 
     private static String DUBBING_FOLDER = "dubbing/";
+    private static String DUBBING_ALL_FOLDER = "dubbing_all/";
+
     private static String RECORD_FOLDER = "record/";
     private static String BLANK_FOLDER = "blank/";
 
@@ -66,7 +69,14 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
 
     private static String lastTime;
 
-    private boolean isDubbing;
+    private static int COMBINE_ORIGINAL = 1;
+    private static int COMBINE_PART = 2;
+    private static int COMBINE_ALL = 3;
+
+    private static int COMBINE = COMBINE_ORIGINAL;
+
+    private int recodeCount = 1;
+    private int blankCount = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +84,8 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
         setContentView(R.layout.activity_media);
 
         btnMerge = findViewById(R.id.btn_merge);
-        btnDubbing = findViewById(R.id.btn_dubbing);
+        btnDubbingPart = findViewById(R.id.btn_dubbing);
+        btnDubbingAll = findViewById(R.id.btn_dubbing_all);
         btnPlay = findViewById(R.id.btn_play);
 
         tvMediaPath = findViewById(R.id.tv_media_path);
@@ -84,7 +95,8 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
         tvCombineSecond = findViewById(R.id.tv_combine_second);
 
         btnMerge.setOnClickListener(this);
-        btnDubbing.setOnClickListener(this);
+        btnDubbingPart.setOnClickListener(this);
+        btnDubbingAll.setOnClickListener(this);
         btnPlay.setOnClickListener(this);
 
         myHandler = new MyHandler();
@@ -97,10 +109,13 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
     public void onClick(View v) {
         int id = v.getId();
         if (id == R.id.btn_merge) {
-            isDubbing = false;
+            COMBINE = COMBINE_ORIGINAL;
             begin();
         } else if (id == R.id.btn_dubbing) {
-            isDubbing = true;
+            COMBINE = COMBINE_PART;
+            begin();
+        } else if (id == R.id.btn_dubbing_all) {
+            COMBINE = COMBINE_ALL;
             begin();
         } else if (id == R.id.btn_play) {
             String videoUrl = FFMPEG_PATH + "combine_audio.mp3";
@@ -134,6 +149,8 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void clearData() {
+        recodeCount = 1;
+        blankCount = 1;
         fileList.clear();
         FileUtils.deleteFile(new File(FFMPEG_PATH), "dubbing", "dubbing_all");
     }
@@ -229,8 +246,6 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
 
     }
 
-    private int recodeCount = 1;
-    private int blankCount = 1;
 
     private void clipAudios(final List<AudioBean> items, final int count) {
         if (count >= items.size()) {
@@ -266,7 +281,6 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
                     }
                     fileList.add(audioName);
                     clipAudios(items, count + 1);
-                    Log.v("lhz", "audioBean: " + item);
                 }
 
                 @Override
@@ -278,6 +292,16 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void combineAudio() {
+        if (COMBINE == COMBINE_PART) {
+            resetFileList(FFMPEG_PATH + DUBBING_FOLDER);
+        } else if (COMBINE == COMBINE_ALL) {
+            resetFileList(FFMPEG_PATH + DUBBING_ALL_FOLDER);
+        }
+
+        for(String item: fileList) {
+            Log.v("lhz", item);
+        }
+
         FileUtils.writeAudioInfo(FFMPEG_PATH + "audioList.txt", fileList);
         String[] cmd = FFmpegCmdUtils.concatAudiosByFile(FFMPEG_PATH + "audioList.txt", FFMPEG_PATH + "combine_audio.mp3");
         FFmpegUtils.executeCmd(this, cmd, new Callback<String>() {
@@ -291,6 +315,25 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
                 myHandler.sendEmptyMessage(FAIL_ACTION);
             }
         });
+    }
+
+    private void resetFileList(String path) {
+        File dubbingFile = new File(path);
+        File[] files = dubbingFile.listFiles();
+        int length = files.length;
+
+        int size = fileList.size();
+        for (int i = 0; i < size; i++) {
+            String fileName = fileList.get(i);
+            File tempFile = new File(fileName);
+            for (int j = 0; j < length; j++) {
+                File duFile = files[j];
+                if (tempFile.getName().equalsIgnoreCase(duFile.getName())) {
+                    String newFileName = duFile.getParentFile().getName() + "/" + duFile.getName();
+                    fileList.set(i, newFileName);
+                }
+            }
+        }
     }
 
     private class MyHandler extends Handler {
