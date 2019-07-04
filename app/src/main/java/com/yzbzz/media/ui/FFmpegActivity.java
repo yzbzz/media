@@ -250,27 +250,7 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
             FFmpegUtils.executeCmd(this, cmd, new Callback<String>() {
                 @Override
                 public void onSuccess(String msg) {
-
-                    String endTime = item.endTime;
-
-                    String dubbingName = "";
-
-                    if (endTime.equalsIgnoreCase("00:00:07.970")) {
-                        dubbingName = DUBBING_FOLDER + "u_00002.mp3";
-                        fileList.add(dubbingName);
-                    } else if (endTime.equalsIgnoreCase("00:00:09.303")) {
-                        dubbingName = DUBBING_FOLDER + "u_00003.mp3";
-                        fileList.add(dubbingName);
-                    } else if (endTime.equalsIgnoreCase("00:00:21.512")) {
-                        dubbingName = DUBBING_FOLDER + "u_00007.mp3";
-                        fileList.add(dubbingName);
-                    } else if (endTime.equalsIgnoreCase("00:00:27.012")) {
-                        dubbingName = DUBBING_FOLDER + "u_00009.mp3";
-                        fileList.add(dubbingName);
-                    } else {
-                        fileList.add(audioName);
-                    }
-                    Log.v("lhz", "endTime: " + endTime + " dubbingName: " + dubbingName);
+                    fileList.add(audioName);
                     clipAudiosByDubbing(items, count + 1);
                 }
 
