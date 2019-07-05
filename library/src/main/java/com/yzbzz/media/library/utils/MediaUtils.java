@@ -10,66 +10,41 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 
 import com.yzbzz.media.library.bean.Audio;
-import com.yzbzz.media.library.bean.AudioEntity;
-import com.yzbzz.media.library.common.Constant;
+import com.yzbzz.media.library.callback.Consumer;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.text.DecimalFormat;
-import java.util.List;
 
 /**
  * Created by yzbzz on 2019-07-03.
  */
 public class MediaUtils {
 
-    public static List<AudioEntity> cutAudios(String sdcardPath, String srcPath, List<AudioEntity> audioEntities, String recordPath, String blankPath) {
-
-        String outName = "dest" + Constant.SUFFIX_WAV;
+    public static void cutAudios(String srcPath, String outputPath, Consumer<Audio> consumer) {
 
         //裁剪后音频的路径
-        String destPath = sdcardPath + outName;
+        String destPath = outputPath;
 
         //解码源音频，得到解码后的文件
-        decodeAudio(srcPath, destPath);
+        boolean isSuccess = decodeAudio(srcPath, destPath);
+        if (!isSuccess) {
+            return;
+        }
 
         if (!FileUtils.checkFileExist(destPath)) {
-            return null;
+            return;
         }
 
         Audio audio = getAudioFromPath(destPath);
-
         if (audio != null) {
-            int size = audioEntities.size();
-            int recodeCount = 1;
-            int blankCount = 1;
-
-            DecimalFormat decimalFormat = new DecimalFormat("000");//确定格式，把1转换为001
-            String suffix;
-
-            for (int i = 0; i < size; i++) {
-                AudioEntity audioEntity = audioEntities.get(i);
-                String path;
-                if (audioEntity.canRead) {
-                    suffix = "u_00" + decimalFormat.format(recodeCount);
-                    path = recordPath;
-                    recodeCount++;
-                } else {
-                    path = blankPath;
-                    suffix = "b_00" + decimalFormat.format(blankCount);
-                    blankCount++;
-                }
-                audioEntity.path = AudioEditUtil.cutAudio(path, audio, suffix, audioEntity.beginTime, audioEntity.endTime);
-            }
+            consumer.accept(audio);
         }
-        return audioEntities;
     }
 
-    public static void decodeAudio(String path, String destPath) {
-        final File file = new File(path);
+    public static boolean decodeAudio(String path, String destPath) {
 
         if (FileUtils.checkFileExist(destPath)) {
             FileUtils.deleteFile(new File(destPath));
@@ -77,7 +52,7 @@ public class MediaUtils {
 
         FileUtils.confirmFolderExist(new File(destPath).getParent());
 
-        DecodeEngine.getInstance().convertMusicFileToWaveFile(path, destPath);
+        return DecodeEngine.getInstance().convertMusicFileToWaveFile(path, destPath);
     }
 
     private static Audio getAudioFromPath(String path) {

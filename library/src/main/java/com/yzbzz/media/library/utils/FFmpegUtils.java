@@ -15,11 +15,11 @@ public class FFmpegUtils {
     private static boolean LOADED;
 
 
-    public static boolean isLoaded(){
+    public static boolean isLoaded() {
         return LOADED;
     }
 
-    public static void load(Context context,final Callback<String> callback) {
+    public static void load(Context context, final Callback<String> callback) {
         try {
             FFmpeg.getInstance(context).loadBinary(new FFmpegLoadBinaryResponseHandler() {
                 @Override
@@ -44,7 +44,7 @@ public class FFmpegUtils {
 
                 }
             });
-        } catch (Exception e){
+        } catch (Exception e) {
             LOADED = false;
             callback.onFailure(e);
         }
