@@ -53,8 +53,8 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
 
     private ProgressDialog progressDialog;
 
-    private long beginTime;
-    private long endTime;
+    private long mBeginTime;
+    private long mEndTime;
 
     private static String lastTime;
 
@@ -116,17 +116,14 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void begin() {
-        beginTime = System.currentTimeMillis();
+        mBeginTime = System.currentTimeMillis();
         progressDialog.show();
         clearData();
 
-        AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
-            @Override
-            public void run() {
-                extractMedia();
-                clipAudio();
-                mixAudio();
-            }
+        AsyncTask.THREAD_POOL_EXECUTOR.execute(() -> {
+            extractMedia();
+            clipAudio();
+            mixAudio();
         });
     }
 
@@ -164,21 +161,15 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void showToast(final String msg) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(MediaActivity.this, msg, Toast.LENGTH_LONG).show();
-            }
-        });
+        runOnUiThread(() ->
+            Toast.makeText(MediaActivity.this, msg, Toast.LENGTH_LONG).show()
+        );
     }
 
     private void dismiss() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (progressDialog.isShowing()) {
-                    progressDialog.dismiss();
-                }
+        runOnUiThread(() -> {
+            if (progressDialog.isShowing()) {
+                progressDialog.dismiss();
             }
         });
     }
@@ -197,41 +188,10 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
 
         if (COMBINE == COMBINE_PART) {
             String path = MEDIA_PATH + DUBBING_FOLDER;
-            File dubbingFile = new File(path);
-            File[] dubbinFile = dubbingFile.listFiles();
-            int length = dubbinFile.length;
-
-            for (int j = 0; j < length; j++) {
-                File duFile = dubbinFile[j];
-                String du = duFile.getName();
-
-                String duM = du.substring(0, du.indexOf("."));
-                String newFileName = duFile.getParentFile().getAbsolutePath() + "/" + duM + ".wav";
-
-                if (du.endsWith(".mp3")) {
-                    MediaUtils.decodeAudio(duFile.getAbsolutePath(), newFileName);
-                }
-            }
-
-            resetFileList(path, files);
-
+            convertAudioFile(path, files);
         } else if (COMBINE == COMBINE_ALL) {
             String path = MEDIA_PATH + DUBBING_ALL_FOLDER;
-            File dubbingFile = new File(path);
-            File[] dubbinFile = dubbingFile.listFiles();
-            int length = dubbinFile.length;
-
-            for (int j = 0; j < length; j++) {
-                File duFile = dubbinFile[j];
-                String du = duFile.getName();
-                String duM = du.substring(0, du.indexOf("."));
-                String newFileName = duFile.getParentFile().getAbsolutePath() + "/" + duM + ".wav";
-
-                if (du.endsWith(".mp3")) {
-                    MediaUtils.decodeAudio(duFile.getAbsolutePath(), newFileName);
-                }
-            }
-            resetFileList(path, files);
+            convertAudioFile(path, files);
         }
 
         try {
@@ -239,51 +199,60 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
             WavMergeUtil.mergeWav(files, new File(MEDIA_PATH + "combine_audio.wav"));
             updateCombineTime();
             dismiss();
-            endTime = System.currentTimeMillis();
-            showToast("合并完成,耗时: " + (endTime - beginTime) + "秒");
+            mEndTime = System.currentTimeMillis();
+            showToast("合并完成,耗时: " + (mEndTime - mBeginTime) + "秒");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void resetFileList(String path, List<File> items) {
+    private void convertAudioFile(String path, List<File> files) {
         File dubbingFile = new File(path);
-        File[] files = dubbingFile.listFiles();
-        int length = files.length;
-
-        int size = items.size();
-        for (int i = 0; i < size; i++) {
-            File fileName = items.get(i);
-            String fn = fileName.getName();
-
-            for (int j = 0; j < length; j++) {
-                File duFile = files[j];
+        File[] dubbinFile = dubbingFile.listFiles();
+        if (null != dubbinFile) {
+            for (File duFile : dubbinFile) {
                 String du = duFile.getName();
+                String duM = du.substring(0, du.indexOf("."));
+                String newFileName = duFile.getParentFile().getAbsolutePath() + "/" + duM + ".wav";
 
-                if (fn.equalsIgnoreCase(du)) {
-                    items.set(i, duFile);
+                if (du.endsWith(".mp3")) {
+                    MediaUtils.decodeAudio(duFile.getAbsolutePath(), newFileName);
                 }
             }
-
+            resetFileList(path, files);
         }
     }
 
+    private void resetFileList(String path, List<File> items) {
 
-    private void combine() {
+        File dubbingFile = new File(path);
+        File[] files = dubbingFile.listFiles();
+
+        if (null != files) {
+            int size = items.size();
+            for (int i = 0; i < size; i++) {
+                File fileName = items.get(i);
+                String fn = fileName.getName();
+                for (File duFile : files) {
+                    String du = duFile.getName();
+                    if (fn.equalsIgnoreCase(du)) {
+                        items.set(i, duFile);
+                    }
+                }
+
+            }
+        }
 
     }
-
 
     private void updateTime() {
         String outFile = MEDIA_PATH + "out_put.mp3";
         long time = MediaUtils.getFilePlayTime(MediaActivity.this, new File(outFile));
         lastTime = DateUtils.getTimeStr(time);
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                tvMediaPath.setText(outFile);
-                tvMediaSecond.setText(String.valueOf(time));
-            }
+
+        runOnUiThread(() -> {
+            tvMediaPath.setText(outFile);
+            tvMediaSecond.setText(String.valueOf(time));
         });
     }
 
@@ -292,12 +261,9 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
 
         long time = MediaUtils.getFilePlayTime(MediaActivity.this, new File(outFile));
 
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                tvCombinePath.setText(outFile);
-                tvCombineSecond.setText(String.valueOf(time));
-            }
+        runOnUiThread(() -> {
+            tvCombinePath.setText(outFile);
+            tvCombineSecond.setText(String.valueOf(time));
         });
     }
 

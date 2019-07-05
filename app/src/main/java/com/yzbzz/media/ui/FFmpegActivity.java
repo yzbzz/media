@@ -286,17 +286,19 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
     private void resetFileList(String path) {
         File dubbingFile = new File(path);
         File[] files = dubbingFile.listFiles();
-        int length = files.length;
+        if (null != files) {
+            int length = files.length;
 
-        int size = fileList.size();
-        for (int i = 0; i < size; i++) {
-            String fileName = fileList.get(i);
-            File tempFile = new File(fileName);
-            for (int j = 0; j < length; j++) {
-                File duFile = files[j];
-                if (tempFile.getName().equalsIgnoreCase(duFile.getName())) {
-                    String newFileName = duFile.getParentFile().getName() + "/" + duFile.getName();
-                    fileList.set(i, newFileName);
+            int size = fileList.size();
+            for (int i = 0; i < size; i++) {
+                String fileName = fileList.get(i);
+                File tempFile = new File(fileName);
+                for (int j = 0; j < length; j++) {
+                    File duFile = files[j];
+                    if (tempFile.getName().equalsIgnoreCase(duFile.getName())) {
+                        String newFileName = duFile.getParentFile().getName() + "/" + duFile.getName();
+                        fileList.set(i, newFileName);
+                    }
                 }
             }
         }

@@ -9,7 +9,7 @@ public class SDCardUtils {
 
     public static String SD_PATH = Environment.getExternalStorageDirectory().getPath();
 
-    public static String ROOT_PATH = SD_PATH + "/x_media_demo";
+    public static String ROOT_PATH = SD_PATH + "/x_demo";
 
     public static String BLANK_PATH = "/blank";
     public static String RECORD_PATH = "/record";
