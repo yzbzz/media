@@ -26,7 +26,7 @@ public class AudioBeanFactory {
             items.add(audioBean);
         }
 
-        DateUtils.calculateTime(items, 200);
+        DateUtils.calculateTime(items, durationTime);
 
         return items;
     }
