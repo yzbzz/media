@@ -23,6 +23,7 @@ import com.yzbzz.media.library.utils.FileUtils;
 import com.yzbzz.media.library.utils.MediaUtils;
 
 import java.io.File;
+import java.lang.ref.WeakReference;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -104,7 +105,7 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
         btnDubbingAll.setOnClickListener(this);
         btnPlay.setOnClickListener(this);
 
-        myHandler = new MyHandler();
+        myHandler = new MyHandler(this);
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("合成中...");
@@ -161,12 +162,9 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void showToast(final String msg) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(FFmpegActivity.this, msg, Toast.LENGTH_LONG).show();
-            }
-        });
+        runOnUiThread(() ->
+                Toast.makeText(FFmpegActivity.this, msg, Toast.LENGTH_LONG).show()
+        );
     }
 
     private void dismiss() {
@@ -304,30 +302,37 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
-    private class MyHandler extends Handler {
+    private static class MyHandler extends Handler {
+
+        private final WeakReference<FFmpegActivity> mTarget;
+
+        public MyHandler(FFmpegActivity fFmpegActivity) {
+            mTarget = new WeakReference<>(fFmpegActivity);
+        }
 
         @Override
         public void handleMessage(Message msg) {
+            FFmpegActivity fFmpegActivity = mTarget.get();
             int what = msg.what;
             if (what == FAIL_ACTION) {
-                showToast("合成失败");
-                dismiss();
+                fFmpegActivity.showToast("合成失败");
+                fFmpegActivity.dismiss();
             } else if (what == EXTRACT_AUDIO_ACTION) { // 分离音频
-                extractorAudio();
+                fFmpegActivity.extractorAudio();
             } else if (what == EXTRACT_VIDEO_ACTION) { // 分离视频
-                updateTime();
-                extractorVideo();
+                fFmpegActivity.updateTime();
+                fFmpegActivity.extractorVideo();
             } else if (what == CLIP_ACTION) { // 切割音频
-                clipAudio();
+                fFmpegActivity.clipAudio();
             } else if (what == COMBINE_AUDIO_ACTION) { // 合成音频
-                combineAudio();
+                fFmpegActivity.combineAudio();
             } else if (what == COMBINE_MEDIA_ACTION) { // 合成音视频
-                updateCombineTime();
-                combineMedia();
+                fFmpegActivity.updateCombineTime();
+                fFmpegActivity.combineMedia();
             } else if (what == DONE_ACTION) { // 完成
-                endTime = System.currentTimeMillis();
-                showToast("合成完成 耗时: " + (endTime - beginTime) + "秒");
-                dismiss();
+                fFmpegActivity.endTime = System.currentTimeMillis();
+                fFmpegActivity.showToast("合成完成 耗时: " + (fFmpegActivity.endTime - fFmpegActivity.beginTime) + "秒");
+                fFmpegActivity.dismiss();
             }
         }
     }
