@@ -50,8 +50,8 @@ public class DecodeEngine {
     /**
      * 将音乐文件解码为wav文件
      *
-     * @param musicFileUrl           源文件路径
-     * @param decodeFileUrl          转换文件路径
+     * @param musicFileUrl  源文件路径
+     * @param decodeFileUrl 转换文件路径
      */
     public boolean convertMusicFileToWaveFile(String musicFileUrl, String decodeFileUrl) {
 
@@ -61,10 +61,10 @@ public class DecodeEngine {
     /**
      * 将音乐文件解码为wav文件
      *
-     * @param musicFileUrl           源文件路径
-     * @param decodeFileUrl          转换文件路径
-     * @param startSecond            开始时间 秒
-     * @param endSecond              结束时间 秒
+     * @param musicFileUrl  源文件路径
+     * @param decodeFileUrl 转换文件路径
+     * @param startSecond   开始时间 秒
+     * @param endSecond     结束时间 秒
      */
     public boolean convertMusicFileToWaveFile(String musicFileUrl, String decodeFileUrl,
                                               double startSecond, double endSecond) {
@@ -76,8 +76,8 @@ public class DecodeEngine {
     /**
      * 将音乐文件解码为pcm文件
      *
-     * @param musicFileUrl           源文件路径
-     * @param decodeFileUrl          转换文件路径
+     * @param musicFileUrl  源文件路径
+     * @param decodeFileUrl 转换文件路径
      */
     public boolean convertMusicFileToPcmFile(String musicFileUrl, String decodeFileUrl) {
 
@@ -87,10 +87,10 @@ public class DecodeEngine {
     /**
      * 将音乐文件解码为pcm文件
      *
-     * @param musicFileUrl           源文件路径
-     * @param decodeFileUrl          转换文件路径
-     * @param startSecond            开始时间 秒
-     * @param endSecond              结束时间 秒
+     * @param musicFileUrl  源文件路径
+     * @param decodeFileUrl 转换文件路径
+     * @param startSecond   开始时间 秒
+     * @param endSecond     结束时间 秒
      */
     public boolean convertMusicFileToPcmFile(String musicFileUrl, String decodeFileUrl,
                                              int startSecond, int endSecond) {
@@ -305,6 +305,15 @@ public class DecodeEngine {
     private void getDecodeData(MediaExtractor mediaExtractor, MediaCodec mediaCodec,
                                String decodeFileUrl, int sampleRate, int channelCount, final long startMicroseconds,
                                final long endMicroseconds) {
+        getDecodeData(mediaExtractor, mediaCodec, decodeFileUrl, sampleRate, channelCount, startMicroseconds, endMicroseconds, false);
+    }
+
+    /**
+     * 解码数据
+     */
+    private void getDecodeData(MediaExtractor mediaExtractor, MediaCodec mediaCodec,
+                               String decodeFileUrl, int sampleRate, int channelCount, final long startMicroseconds,
+                               final long endMicroseconds, boolean isReset) {
 
         //初始化解码状态，未解析完成
         boolean decodeInputEnd = false;
@@ -357,7 +366,7 @@ public class DecodeEngine {
 
         //获取解码后文件的输出流
         BufferedOutputStream bufferedOutputStream =
-                FileFunction.getBufferedOutputStreamFromFile(decodeFileUrl);
+                FileUtils.getBufferedOutputStreamFromFile(decodeFileUrl);
 
         //开始进入循环解码操作，判断读入源音频数据是否完成，输出解码音频数据是否完成
         while (!decodeOutputEnd) {
@@ -465,20 +474,28 @@ public class DecodeEngine {
                         continue;
                     }
 
-//                    //采样位数转换，按自己需要是否实现
-//                    byte[] convertByteNumberByteArray =
-//                            convertByteNumber(byteNumber, Constant.ExportByteNumber, sourceByteArray);
-//
-//                    //声道转换，按自己需要是否实现
-//                    byte[] resultByteArray = convertChannelNumber(channelCount, Constant.ExportChannelNumber,
-//                            Constant.ExportByteNumber, convertByteNumberByteArray);
+                    byte[] b;
 
-                    //将解码后的PCM数据写入到PCM文件
+                    if (isReset) {
+                        //采样位数转换，按自己需要是否实现
+                        byte[] convertByteNumberByteArray =
+                                convertByteNumber(byteNumber, Constant.ExportByteNumber, sourceByteArray);
+
+                        //声道转换，按自己需要是否实现
+                        byte[] resultByteArray = convertChannelNumber(channelCount, Constant.ExportChannelNumber,
+                                Constant.ExportByteNumber, convertByteNumberByteArray);
+
+                        b = resultByteArray;
+                    } else {
+                        b = sourceByteArray;
+                    }
+                    // 将解码后的PCM数据写入到PCM文件
                     try {
-                        bufferedOutputStream.write(sourceByteArray);
+                        bufferedOutputStream.write(b);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+
                 }
 
                 if (presentationTimeUs > endMicroseconds) {
@@ -497,10 +514,12 @@ public class DecodeEngine {
             }
         }
 
-//        //重置采样率
-//        if (sampleRate != Constant.ExportSampleRate) {
-//            Resample(sampleRate, decodeFileUrl);
-//        }
+        if (isReset) {
+            //重置采样率
+            if (sampleRate != Constant.ExportSampleRate) {
+                Resample(sampleRate, decodeFileUrl);
+            }
+        }
 
         //释放mediaCodec 和 mediaExtractor
         if (mediaCodec != null) {
@@ -529,7 +548,7 @@ public class DecodeEngine {
             fileInputStream.close();
             fileOutputStream.close();
 
-            FileFunction.renameFile(newDecodeFileUrl, decodeFileUrl);
+            FileUtils.renameFile(newDecodeFileUrl, decodeFileUrl);
         } catch (IOException e) {
             e.printStackTrace();
         }
