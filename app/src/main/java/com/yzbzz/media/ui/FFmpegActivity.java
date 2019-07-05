@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -81,6 +82,9 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_media);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
 
         btnMerge = findViewById(R.id.btn_merge);
         btnDubbingPart = findViewById(R.id.btn_dubbing);
@@ -372,5 +376,13 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
         long time = MediaUtils.getFilePlayTime(this, new File(outFile));
         tvCombinePath.setText(outFile);
         tvCombineSecond.setText(String.valueOf(time));
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
