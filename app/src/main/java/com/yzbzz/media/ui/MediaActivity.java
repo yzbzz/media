@@ -261,7 +261,6 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
                 String du = duFile.getName();
 
                 if (fn.equalsIgnoreCase(du)) {
-                    Log.v("lhz", "fn: " + fn + " du: " + du);
                     items.set(i, duFile);
                 }
             }

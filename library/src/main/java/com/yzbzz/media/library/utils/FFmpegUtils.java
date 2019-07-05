@@ -1,7 +1,6 @@
 package com.yzbzz.media.library.utils;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
 import com.github.hiteshsondhi88.libffmpeg.FFmpegExecuteResponseHandler;
@@ -71,7 +70,6 @@ public class FFmpegUtils {
                 @Override
                 public void onFailure(String message) {
                     callback.onFailure(new Exception(message));
-                    Log.v("lhz","message: " + message);
                 }
 
                 @Override

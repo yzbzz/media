@@ -1,7 +1,5 @@
 package com.yzbzz.media.library.utils;
 
-import android.util.Log;
-
 import java.util.List;
 
 /**
@@ -119,7 +117,6 @@ public class FFmpegCmdUtils {
         // ffmpeg -f concat -safe 0 -i mylist.txt -c copy -y combineall.mp3
         String cmd = "-f concat -safe 0 -i %s -c copy -y %s";
         cmd = String.format(cmd, file, targetFile);
-        Log.v("lhz", "cmd: " + cmd);
         return cmd.split(" ");//以空格分割为字符串数组
     }
 
@@ -149,7 +146,6 @@ public class FFmpegCmdUtils {
         stringBuilder.append(" copy ");
         stringBuilder.append(targetFile);
         String concatAudioCmd = stringBuilder.toString();
-        Log.v("lhz", "concatAudioCmd: " + concatAudioCmd);
         return concatAudioCmd.split(" ");//以空格分割为字符串数组
     }
 

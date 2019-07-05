@@ -6,7 +6,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 
 import com.google.android.exoplayer2.ExoPlaybackException;
@@ -103,7 +102,6 @@ public class ExoPlayerActivity extends AppCompatActivity implements View.OnClick
 
             @Override
             public void onPlayerError(ExoPlaybackException error) {
-                Log.v("lhz",Log.getStackTraceString(error));
             }
 
             @Override
