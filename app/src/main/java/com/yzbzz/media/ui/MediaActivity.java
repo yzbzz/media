@@ -38,8 +38,8 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
     private TextView tvCombinePath;
     private TextView tvCombineSecond;
 
-    private static String VIDEO_PATH = SDCardUtils.MEDIA_PATH + "/4594.mp4";
-    private static String MEDIA_PATH = SDCardUtils.MEDIA_PATH + "/media/";
+    private static String VIDEO_PATH = SDCardUtils.ROOT_PATH + "/4594.mp4";
+    private static String MEDIA_PATH = SDCardUtils.MEDIA_PATH + "/";
 
     private static String DUBBING_FOLDER = "dubbing/";
     private static String DUBBING_ALL_FOLDER = "dubbing_all/";

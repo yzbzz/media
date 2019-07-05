@@ -12,6 +12,13 @@ import android.widget.Button;
 import com.yzbzz.media.ui.FFmpegActivity;
 import com.yzbzz.media.ui.MediaActivity;
 
+import java.io.File;
+import java.io.IOException;
+
+import static com.yzbzz.media.SDCardUtils.FFMPEG_PATH;
+import static com.yzbzz.media.SDCardUtils.MEDIA_PATH;
+import static com.yzbzz.media.SDCardUtils.ROOT_PATH;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private Button btnFFmpeg;
@@ -47,5 +54,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else if (id == R.id.btn_media) {
             startActivity(new Intent(this, MediaActivity.class));
         }
+    }
+
+    private void createFile() {
+        File rootFile = new File(ROOT_PATH);
+        File ffmpegFile = new File(FFMPEG_PATH);
+        File mediaFile = new File(MEDIA_PATH);
+
+        if (!rootFile.exists()) {
+            try {
+                rootFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (!ffmpegFile.exists()) {
+            try {
+                ffmpegFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (!mediaFile.exists()) {
+            try {
+                mediaFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 }

@@ -40,8 +40,8 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
     private TextView tvCombinePath;
     private TextView tvCombineSecond;
 
-    private static String VIDEO_PATH = SDCardUtils.MEDIA_PATH + "/4594.mp4";
-    private static String FFMPEG_PATH = SDCardUtils.MEDIA_PATH + "/ffmpeg/";
+    private static String VIDEO_PATH = SDCardUtils.ROOT_PATH + "/4594.mp4";
+    private static String FFMPEG_PATH = SDCardUtils.FFMPEG_PATH + "/";
 
     private static String DUBBING_FOLDER = "dubbing/";
     private static String DUBBING_ALL_FOLDER = "dubbing_all/";
