@@ -83,8 +83,10 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_media);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
+        if (null != getSupportActionBar()) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeButtonEnabled(true);
+        }
 
         btnMerge = findViewById(R.id.btn_merge);
         btnDubbingPart = findViewById(R.id.btn_dubbing);

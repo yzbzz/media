@@ -45,8 +45,6 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
     private static String DUBBING_FOLDER = "dubbing/";
     private static String DUBBING_ALL_FOLDER = "dubbing_all/";
 
-    private static String DUBBING_WAV_FOLDER = "dubbing_wav/";
-
     private static String RECORD_FOLDER = "record/";
     private static String BLANK_FOLDER = "blank/";
 
@@ -74,10 +72,11 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_media);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
+        if (null != getSupportActionBar()) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeButtonEnabled(true);
+        }
 
-        btnMerge = findViewById(R.id.btn_merge);
         btnDubbingPart = findViewById(R.id.btn_dubbing);
         btnDubbingAll = findViewById(R.id.btn_dubbing_all);
         btnPlay = findViewById(R.id.btn_play);
@@ -145,8 +144,7 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
 
     private void clipAudio() {
 
-
-        List<AudioBean> items = AudioBeanFactory.getAudioBeans(lastTime,100);
+        List<AudioBean> items = AudioBeanFactory.getAudioBeans(lastTime, 100);
 
         clipAudios(items);
     }
@@ -162,7 +160,6 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
         }
 
         MediaUtils.cutAudios(RECORD_PATH, MEDIA_PATH + "out_put.mp3", audioEntities, RECORD_PATH, BLANK_PATH);
-
 
     }
 
@@ -264,31 +261,12 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
                 String du = duFile.getName();
 
                 if (fn.equalsIgnoreCase(du)) {
-                    Log.v("lhz","fn: " + fn+" du: " + du);
+                    Log.v("lhz", "fn: " + fn + " du: " + du);
                     items.set(i, duFile);
                 }
             }
 
         }
-//        for (int i = 0; i < size; i++) {
-//            File fileName = items.get(i);
-//            String fn = fileName.getName();
-//            String fnM = fn.substring(0, fn.indexOf("."));
-//
-//            for (int j = 0; j < length; j++) {
-//                File duFile = files[j];
-//                String du = duFile.getName();
-//                if (du.endsWith(".mp3")) {
-//                    String duM = du.substring(0, du.indexOf("."));
-//                    if (fnM.equalsIgnoreCase(duM)) {
-//                        String newFileName = duFile.getParentFile().getAbsolutePath() + "/" + duM + ".wav";
-//
-//                        MediaUtils.decodeAudio(duFile.getAbsolutePath(), newFileName);
-//                        items.set(i, new File(newFileName));
-//                    }
-//                }
-//            }
-//        }
     }
 
 
