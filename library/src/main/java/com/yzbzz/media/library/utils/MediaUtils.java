@@ -14,6 +14,7 @@ import com.yzbzz.media.library.bean.AudioEntity;
 import com.yzbzz.media.library.common.Constant;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -465,5 +466,26 @@ public class MediaUtils {
         String durationStr = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
         mediaMetadataRetriever.release();
         return durationStr;
+    }
+
+    public static long getWavDuration(String sourceFile) {
+        MediaExtractor mediaExtractor = new MediaExtractor();
+        MediaFormat mediaFormat;
+
+        try {
+            mediaExtractor.setDataSource(sourceFile);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            try {
+                mediaExtractor.setDataSource(new FileInputStream(sourceFile).getFD());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        mediaFormat = mediaExtractor.getTrackFormat(0);
+        long duration = mediaFormat.containsKey(MediaFormat.KEY_DURATION) ? mediaFormat.getLong(MediaFormat.KEY_DURATION) : 0;
+        mediaExtractor.release();
+        return duration;
     }
 }
