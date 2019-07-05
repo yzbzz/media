@@ -13,14 +13,19 @@ import android.widget.Toast;
 import com.yzbzz.media.R;
 import com.yzbzz.media.SDCardUtils;
 import com.yzbzz.media.data.AudioBeanFactory;
+import com.yzbzz.media.library.bean.Audio;
 import com.yzbzz.media.library.bean.AudioBean;
 import com.yzbzz.media.library.bean.AudioEntity;
+import com.yzbzz.media.library.callback.Consumer;
+import com.yzbzz.media.library.common.Constant;
+import com.yzbzz.media.library.utils.AudioEditUtil;
 import com.yzbzz.media.library.utils.DateUtils;
 import com.yzbzz.media.library.utils.FileUtils;
 import com.yzbzz.media.library.utils.MediaUtils;
 import com.yzbzz.media.library.utils.WavMergeUtil;
 
 import java.io.File;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -156,7 +161,35 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
             audioEntities.add(audioEntity);
         }
 
-        MediaUtils.cutAudios(RECORD_PATH, MEDIA_PATH + "out_put.mp3", audioEntities, RECORD_PATH, BLANK_PATH);
+        //裁剪后音频的路径
+        String destPath = RECORD_PATH + "dest" + Constant.SUFFIX_WAV;
+
+        MediaUtils.cutAudios(MEDIA_PATH + "out_put.mp3", destPath, new Consumer<Audio>() {
+            @Override
+            public void accept(Audio audio) {
+                int size = audioEntities.size();
+                int recodeCount = 1;
+                int blankCount = 1;
+
+                DecimalFormat decimalFormat = new DecimalFormat("000");//确定格式，把1转换为001
+                String suffix;
+
+                for (int i = 0; i < size; i++) {
+                    AudioEntity audioEntity = audioEntities.get(i);
+                    String path;
+                    if (audioEntity.canRead) {
+                        suffix = "u_00" + decimalFormat.format(recodeCount);
+                        path = RECORD_PATH;
+                        recodeCount++;
+                    } else {
+                        path = BLANK_PATH;
+                        suffix = "b_00" + decimalFormat.format(blankCount);
+                        blankCount++;
+                    }
+                    audioEntity.path = AudioEditUtil.cutAudio(path, audio, suffix, audioEntity.beginTime, audioEntity.endTime);
+                }
+            }
+        });
 
     }
 
