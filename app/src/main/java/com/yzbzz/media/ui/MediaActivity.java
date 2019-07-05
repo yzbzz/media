@@ -146,7 +146,7 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
     private void clipAudio() {
 
 
-        List<AudioBean> items = AudioBeanFactory.getAudioBeans(lastTime,200);
+        List<AudioBean> items = AudioBeanFactory.getAudioBeans(lastTime,100);
 
         clipAudios(items);
     }

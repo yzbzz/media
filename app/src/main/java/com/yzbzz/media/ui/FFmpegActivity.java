@@ -212,7 +212,7 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void clipAudio() {
-        List<AudioBean> items = AudioBeanFactory.getAudioBeans(lastTime, 200);
+        List<AudioBean> items = AudioBeanFactory.getAudioBeans(lastTime, 100);
         clipAudios(items, 0);
     }
 
