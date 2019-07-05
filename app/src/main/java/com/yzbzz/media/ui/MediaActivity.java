@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -77,6 +76,7 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
             getSupportActionBar().setHomeButtonEnabled(true);
         }
 
+        btnMerge = findViewById(R.id.btn_merge);
         btnDubbingPart = findViewById(R.id.btn_dubbing);
         btnDubbingAll = findViewById(R.id.btn_dubbing_all);
         btnPlay = findViewById(R.id.btn_play);
