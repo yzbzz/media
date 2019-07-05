@@ -7,6 +7,17 @@
     android:paddingTop="30dp">
 
     <Button
+        android:id="@+id/btn_init"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginHorizontal="20dp"
+        android:background="@color/colorPrimary"
+        android:gravity="center"
+        android:text="初始化文件目录"
+        android:textColor="#ffffff"/>
+
+    <Button
+        android:layout_marginTop="10dp"
         android:id="@+id/btn_ffmpeg"
         android:layout_width="match_parent"
         android:layout_height="50dp"

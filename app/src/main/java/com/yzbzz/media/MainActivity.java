@@ -8,19 +8,18 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.yzbzz.media.ui.FFmpegActivity;
 import com.yzbzz.media.ui.MediaActivity;
 
 import java.io.File;
-import java.io.IOException;
-
-import static com.yzbzz.media.SDCardUtils.FFMPEG_PATH;
-import static com.yzbzz.media.SDCardUtils.MEDIA_PATH;
-import static com.yzbzz.media.SDCardUtils.ROOT_PATH;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
+    private Button btnInit;
     private Button btnFFmpeg;
     private Button btnMedia;
 
@@ -29,9 +28,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        btnInit = findViewById(R.id.btn_init);
         btnFFmpeg = findViewById(R.id.btn_ffmpeg);
         btnMedia = findViewById(R.id.btn_media);
 
+        btnInit.setOnClickListener(this);
         btnFFmpeg.setOnClickListener(this);
         btnMedia.setOnClickListener(this);
 
@@ -40,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             String permissions = Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
             if (this.checkSelfPermission(permissions) != PackageManager.PERMISSION_GRANTED) {
-                this.requestPermissions(new String[]{permissions}, REQUEST_CODE_CONTACT);
+                this.requestPermissions(new String[]{permissions, Manifest.permission.MOUNT_UNMOUNT_FILESYSTEMS}, REQUEST_CODE_CONTACT);
             }
         }
     }
@@ -49,7 +50,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         int id = v.getId();
-        if (id == R.id.btn_ffmpeg) {
+        if (id == R.id.btn_init) {
+            createFile();
+        } else if (id == R.id.btn_ffmpeg) {
             startActivity(new Intent(this, FFmpegActivity.class));
         } else if (id == R.id.btn_media) {
             startActivity(new Intent(this, MediaActivity.class));
@@ -57,33 +60,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void createFile() {
-        File rootFile = new File(ROOT_PATH);
-        File ffmpegFile = new File(FFMPEG_PATH);
-        File mediaFile = new File(MEDIA_PATH);
 
-        if (!rootFile.exists()) {
-            try {
-                rootFile.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        boolean result = true;
+
+        List<File> fileList = new ArrayList<>();
+        fileList.add(new File(SDCardUtils.FFMPEG_PATH_BLANK));
+        fileList.add(new File(SDCardUtils.FFMPEG_PATH_RECORD));
+        fileList.add(new File(SDCardUtils.FFMPEG_PATH_DUBBING));
+        fileList.add(new File(SDCardUtils.FFMPEG_PATH_DUBBING_ALL));
+
+        fileList.add(new File(SDCardUtils.MEDIA_PATH_BLANK));
+        fileList.add(new File(SDCardUtils.MEDIA_PATH_RECORD));
+        fileList.add(new File(SDCardUtils.MEDIA_PATH_DUBBING));
+        fileList.add(new File(SDCardUtils.MEDIA_PATH_DUBBING_ALL));
+
+        for (File file : fileList) {
+            if (!file.exists()) {
+                result = result && file.mkdirs();
+             }
         }
 
-        if (!ffmpegFile.exists()) {
-            try {
-                ffmpegFile.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        if (!mediaFile.exists()) {
-            try {
-                mediaFile.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
+        Toast.makeText(this, result ? "初始化成功" : "初始化失败", Toast.LENGTH_SHORT).show();
     }
 }
