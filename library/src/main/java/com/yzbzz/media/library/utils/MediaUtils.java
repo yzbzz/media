@@ -83,9 +83,8 @@ public class MediaUtils {
             mediaPlayer.release();
             return duration;
         } catch (Exception e) {
-            e.printStackTrace();
+            return 0;
         }
-        return 0;
     }
 
     public static void exactorMedia(String input, String outputVideo, String outputAudio) {

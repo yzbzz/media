@@ -13,7 +13,7 @@
         android:layout_marginHorizontal="20dp"
         android:background="@color/colorPrimary"
         android:gravity="center"
-        android:text="初始化文件目录"
+        android:text="初始化"
         android:textColor="#ffffff"/>
 
     <Button

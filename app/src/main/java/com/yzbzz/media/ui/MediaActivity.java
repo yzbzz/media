@@ -134,7 +134,7 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
 
     private void clearData() {
         audioEntities.clear();
-        FileUtils.deleteFile(new File(MEDIA_PATH), "dubbing", "dubbing_all");
+        FileUtils.deleteFile(new File(MEDIA_PATH),"dubbing","dubbing_all");
     }
 
     private void extractMedia() {

@@ -1,5 +1,6 @@
 package com.yzbzz.media.library.utils;
 
+import android.content.Context;
 import android.os.Environment;
 import android.text.TextUtils;
 
@@ -7,15 +8,19 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 /**
  * Created by yzbzz on 2019-07-03.
  */
 public class FileUtils {
+
+    private static final String SEPARATOR = File.separator;
 
     public static void copyFile(File sourcefile, File targetFile) throws IOException {
 
@@ -78,11 +83,13 @@ public class FileUtils {
                 break;
             }
         }
-        if (file.isDirectory() && isDeleteFile) {
-            File[] files = file.listFiles();
-            for (int i = 0; i < files.length; i++) {
-                File f = files[i];
-                deleteFile(f, filterName);
+        if (file.isDirectory()) {
+            if (isDeleteFile) {
+                File[] files = file.listFiles();
+                for (int i = 0; i < files.length; i++) {
+                    File f = files[i];
+                    deleteFile(f, filterName);
+                }
             }
             // file.delete();//如要保留文件夹，只删除文件，请注释这行
         } else if (file.exists()) {
@@ -333,6 +340,41 @@ public class FileUtils {
                     e.printStackTrace();
                 }
             }
+        }
+    }
+
+    public static void copyFilesFromRaw(Context context, int id, String outputPath, String fileName) {
+        InputStream inputStream = context.getResources().openRawResource(id);
+        File file = new File(outputPath);
+        if (!file.exists()) {//如果文件夹不存在，则创建新的文件夹
+            file.mkdirs();
+        }
+        readInputStream(outputPath + SEPARATOR + fileName, inputStream);
+    }
+
+    public static void readInputStream(String storagePath, InputStream inputStream) {
+        File file = new File(storagePath);
+        try {
+            if (!file.exists()) {
+                // 1.建立通道对象
+                FileOutputStream fos = new FileOutputStream(file);
+                // 2.定义存储空间
+                byte[] buffer = new byte[inputStream.available()];
+                // 3.开始读文件
+                int lenght = 0;
+                while ((lenght = inputStream.read(buffer)) != -1) {// 循环从输入流读取buffer字节
+                    // 将Buffer中的数据写到outputStream对象中
+                    fos.write(buffer, 0, lenght);
+                }
+                fos.flush();// 刷新缓冲区
+                // 4.关闭流
+                fos.close();
+                inputStream.close();
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

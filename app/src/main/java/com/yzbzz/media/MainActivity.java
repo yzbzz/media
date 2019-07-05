@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.yzbzz.media.library.utils.FileUtils;
 import com.yzbzz.media.ui.FFmpegActivity;
 import com.yzbzz.media.ui.MediaActivity;
 
@@ -81,5 +82,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         Toast.makeText(this, result ? "初始化成功" : "初始化失败", Toast.LENGTH_SHORT).show();
+
+        FileUtils.copyFilesFromRaw(this,R.raw.video,SDCardUtils.ROOT_PATH,"4594.mp4");
     }
 }
