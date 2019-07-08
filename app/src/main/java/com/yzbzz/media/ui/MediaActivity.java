@@ -79,6 +79,8 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
         if (null != getSupportActionBar()) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeButtonEnabled(true);
+            getSupportActionBar().setTitle("Media");
+
         }
 
         btnMerge = findViewById(R.id.btn_merge);
@@ -134,7 +136,7 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
 
     private void clearData() {
         audioEntities.clear();
-        FileUtils.deleteFile(new File(MEDIA_PATH),"dubbing","dubbing_all");
+        FileUtils.deleteFile(new File(MEDIA_PATH), "dubbing", "dubbing_all");
     }
 
     private void extractMedia() {
@@ -195,7 +197,7 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
 
     private void showToast(final String msg) {
         runOnUiThread(() ->
-            Toast.makeText(MediaActivity.this, msg, Toast.LENGTH_LONG).show()
+                Toast.makeText(MediaActivity.this, msg, Toast.LENGTH_LONG).show()
         );
     }
 

@@ -87,6 +87,7 @@ public class FFmpegActivity extends AppCompatActivity implements View.OnClickLis
         if (null != getSupportActionBar()) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeButtonEnabled(true);
+            getSupportActionBar().setTitle("FFmpeg");
         }
 
         btnMerge = findViewById(R.id.btn_merge);
