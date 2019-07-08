@@ -94,7 +94,7 @@ allprojects {
 
 ```
 dependencies {
-    implementation 'com.github.yzbzz:media:1.0.0'
+    implementation 'com.github.yzbzz:media:1.0.1'
     implementation 'com.writingminds:FFmpegAndroid:0.3.2'
 }
 ```
