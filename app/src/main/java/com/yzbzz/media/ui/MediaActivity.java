@@ -243,9 +243,9 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
 
     private void convertAudioFile(String path, List<File> files) {
         File dubbingFile = new File(path);
-        File[] dubbinFile = dubbingFile.listFiles();
-        if (null != dubbinFile) {
-            for (File duFile : dubbinFile) {
+        File[] dubbingFiles = dubbingFile.listFiles();
+        if (null != dubbingFiles) {
+            for (File duFile : dubbingFiles) {
                 String du = duFile.getName();
                 String duM = du.substring(0, du.indexOf("."));
                 String newFileName = duFile.getParentFile().getAbsolutePath() + "/" + duM + ".wav";
