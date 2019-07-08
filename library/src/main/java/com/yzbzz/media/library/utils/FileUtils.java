@@ -348,9 +348,9 @@ public class FileUtils {
             if (!file.exists()) {
                 FileOutputStream fos = new FileOutputStream(file);
                 byte[] buffer = new byte[inputStream.available()];
-                int lenght;
-                while ((lenght = inputStream.read(buffer)) != -1) {
-                    fos.write(buffer, 0, lenght);
+                int length;
+                while ((length = inputStream.read(buffer)) != -1) {
+                    fos.write(buffer, 0, length);
                 }
                 fos.flush();
                 fos.close();
