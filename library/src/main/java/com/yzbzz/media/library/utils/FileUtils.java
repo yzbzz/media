@@ -24,21 +24,17 @@ public class FileUtils {
 
     public static void copyFile(File sourcefile, File targetFile) throws IOException {
 
-        // 新建文件输入流并对它进行缓冲
         FileInputStream input = new FileInputStream(sourcefile);
 
-        // 新建文件输出流并对它进行缓冲
         FileOutputStream out = new FileOutputStream(targetFile);
         BufferedOutputStream outbuff = new BufferedOutputStream(out);
 
-        // 缓冲数组
         byte[] b = new byte[1024];
-        int len = 0;
+        int len;
         while ((len = input.read(b)) != -1) {
             outbuff.write(b, 0, len);
         }
 
-        //关闭文件
         outbuff.close();
         input.close();
 
@@ -46,26 +42,20 @@ public class FileUtils {
 
     public static void copyDirectiory(String sourceDir, String targetDir) throws IOException {
 
-        // 新建目标目录
         (new File(targetDir)).mkdirs();
 
-        // 获取源文件夹当下的文件或目录
         File[] file = (new File(sourceDir)).listFiles();
 
         for (int i = 0; i < file.length; i++) {
             if (file[i].isFile()) {
-                // 源文件
                 File sourceFile = file[i];
-                // 目标文件
                 File targetFile = new File(targetDir + File.separator + sourceFile.getName());
                 copyFile(sourceFile, targetFile);
 
             }
 
             if (file[i].isDirectory()) {
-                // 准备复制的源文件夹
                 String dir1 = sourceDir + File.separator + file[i].getName();
-                // 准备复制的目标文件夹
                 String dir2 = targetDir + File.separator + file[i].getName();
 
                 copyDirectiory(dir1, dir2);
@@ -91,7 +81,7 @@ public class FileUtils {
                     deleteFile(f, filterName);
                 }
             }
-            // file.delete();//如要保留文件夹，只删除文件，请注释这行
+            // file.delete();
         } else if (file.exists()) {
             file.delete();
         }
@@ -104,7 +94,7 @@ public class FileUtils {
                 File f = files[i];
                 deleteFile(f);
             }
-            // file.delete();//如要保留文件夹，只删除文件，请注释这行
+            // file.delete();
         } else if (file.exists()) {
             file.delete();
         }
@@ -346,7 +336,7 @@ public class FileUtils {
     public static void copyFilesFromRaw(Context context, int id, String outputPath, String fileName) {
         InputStream inputStream = context.getResources().openRawResource(id);
         File file = new File(outputPath);
-        if (!file.exists()) {//如果文件夹不存在，则创建新的文件夹
+        if (!file.exists()) {
             file.mkdirs();
         }
         readInputStream(outputPath + SEPARATOR + fileName, inputStream);
@@ -356,18 +346,13 @@ public class FileUtils {
         File file = new File(storagePath);
         try {
             if (!file.exists()) {
-                // 1.建立通道对象
                 FileOutputStream fos = new FileOutputStream(file);
-                // 2.定义存储空间
                 byte[] buffer = new byte[inputStream.available()];
-                // 3.开始读文件
-                int lenght = 0;
-                while ((lenght = inputStream.read(buffer)) != -1) {// 循环从输入流读取buffer字节
-                    // 将Buffer中的数据写到outputStream对象中
+                int lenght;
+                while ((lenght = inputStream.read(buffer)) != -1) {
                     fos.write(buffer, 0, lenght);
                 }
-                fos.flush();// 刷新缓冲区
-                // 4.关闭流
+                fos.flush();
                 fos.close();
                 inputStream.close();
             }
